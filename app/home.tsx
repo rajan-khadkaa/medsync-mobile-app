@@ -119,7 +119,8 @@ export default function HomeScreen() {
         <View style={styles.headerContent}>
           <View style={styles.headerTop}>
             <View style={styles.flex1}>
-              <Text style={styles.greeting}>Daily Progress</Text>
+              <Text className="text-red-600 text-2xl">Daily Progress</Text>
+              {/* <Text style={styles.greeting}>Daily Progress</Text> */}
             </View>
             <TouchableOpacity style={styles.notificationBtn}>
               <View style={styles.notificationIconContainer}>
