@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, Animated } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useState, useRef } from "react";
+import { View, Text, Animated, ImageBackground } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
 
 export default function SplashScreen() {
@@ -29,41 +29,36 @@ export default function SplashScreen() {
 
     return () => clearTimeout(timer);
   }, []);
+
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-[#3da35d] items-center justify-center">
       <Animated.View
+        className="items-center"
         style={[
-          styles.iconContainer,
           {
             opacity: fadeAnim,
             transform: [{ scale: scaleAnim }],
           },
         ]}
       >
-        {/* <Ionicons name="medical" size={100} color="white" /> */}
-        <MaterialIcons name="health-and-safety" size={100} color="white" />
-        <Text style={styles.splashLogo}>Medsync</Text>
+        <View className="flex items-center justify-center">
+          <View className="items-center justify-center size-28 p-4 rounded-full bg-white">
+            <ImageBackground
+              className="h-full w-full"
+              source={require("../assets/images/medsync-logo.png")}
+            />
+          </View>
+          <Text className="text-white text-[32px] font-bold mt-5 tracking-wider">
+            Medsync
+          </Text>
+        </View>
+        {/* <View className="items-center justify-center p-4 rounded-full bg-white">
+          <MaterialIcons name="health-and-safety" size={100} color="#3da35d" />
+        </View>
+        <Text className="text-white text-[32px] font-bold mt-5 tracking-wider">
+          Medsync
+        </Text> */}
       </Animated.View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    flex: 1,
-    backgroundColor: "#3464fa",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  iconContainer: {
-    alignItems: "center",
-  },
-  splashLogo: {
-    color: "white",
-    fontSize: 32,
-    fontWeight: "bold",
-    marginTop: 20,
-    letterSpacing: 1,
-  },
-});
