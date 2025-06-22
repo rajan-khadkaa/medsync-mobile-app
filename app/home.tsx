@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState, useRef, useCallback } from "react";
@@ -10,6 +11,8 @@ import {
   Animated,
   Dimensions,
   Alert,
+  Modal,
+  Pressable,
 } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
@@ -137,8 +140,32 @@ export default function HomeScreen() {
     name: string;
     doses: string;
     time: string;
+    bgColor: string;
     taken: boolean;
+    icon: string;
   }
+  const [notificationModal, setNotificationModal] = useState<boolean>(false);
+  const [medData, setMedData] = useState({});
+
+  useEffect(() => {
+    getMedData();
+  }, []);
+
+  const getMedData = async () => {
+    try {
+      const stringMedData = await AsyncStorage.getItem("@medicationData");
+
+      if (stringMedData) {
+        const medicationData = await JSON.parse(stringMedData);
+        console.log("medication data from storage", medicationData);
+        setMedData(medicationData);
+      } else {
+        console.log("No med data");
+      }
+    } catch (error) {
+      console.log("Error: ", error);
+    }
+  };
 
   const handleMedToggle = (id: string) => {
     const medication = medications.find((med) => med.id === id);
@@ -179,22 +206,98 @@ export default function HomeScreen() {
     {
       id: "1",
       name: "Aspirin",
-      doses: "1 tablet",
+      doses: "81mg", // Heart health
       time: "8:00 AM",
+      bgColor: "#D4EDDA", // Soft mint
       taken: true,
+      icon: "heart-outline", // Ionicons
     },
     {
       id: "2",
       name: "Ibuprofen",
-      doses: "2 tablets",
+      doses: "200mg", // Pain/fever
       time: "12:00 PM",
+      bgColor: "#FFF3CD", // Pale butter
       taken: false,
+      icon: "flame-outline",
+    },
+    {
+      id: "3",
+      name: "Vitamin D3",
+      doses: "1000 IU", // Bone health
+      time: "10:00 AM",
+      bgColor: "#D1E7FF", // Washed sky blue
+      taken: false,
+      icon: "sunny-outline",
+    },
+    {
+      id: "4",
+      name: "Paracetamol",
+      doses: "500mg", // Painkiller
+      time: "3:00 PM",
+      bgColor: "#FFE8E8", // Blush pink
+      taken: false,
+      icon: "medkit-outline",
+    },
+    {
+      id: "5",
+      name: "Omeprazole",
+      doses: "20mg", // Acid reflux
+      time: "7:00 AM",
+      bgColor: "#E8F4F8", // Frosted teal
+      taken: false,
+      icon: "shield-checkmark-outline",
+    },
+    {
+      id: "6",
+      name: "Metformin",
+      doses: "500mg", // Diabetes
+      time: "6:00 PM",
+      bgColor: "#F0E6FF", // Lavender mist
+      taken: false,
+      icon: "pulse-outline",
+    },
+    {
+      id: "7",
+      name: "Cetirizine",
+      doses: "10mg", // Allergies
+      time: "9:00 PM",
+      bgColor: "#FFEDD5", // Peach cream
+      taken: false,
+      icon: "flower-outline",
+    },
+    {
+      id: "8",
+      name: "Atorvastatin",
+      doses: "20mg", // Cholesterol
+      time: "8:00 PM",
+      bgColor: "#E0F2F1", // Seafoam
+      taken: false,
+      icon: "water-outline",
+    },
+    {
+      id: "9",
+      name: "Levothyroxine",
+      doses: "50mcg", // Thyroid
+      time: "6:00 AM",
+      bgColor: "#F5E6FF", // Lilac haze
+      taken: false,
+      icon: "git-branch-outline",
+    },
+    {
+      id: "10",
+      name: "Amoxicillin",
+      doses: "500mg", // Antibiotic
+      time: "2:00 PM",
+      bgColor: "#FFE5D9", // Barely-there coral
+      taken: false,
+      icon: "bug-outline",
     },
   ]);
 
   return (
     <ScrollView
-      className="flex-1 bg-[#fff]"
+      className=" relative bg-[#fff]"
       showsVerticalScrollIndicator={false}
     >
       <LinearGradient
@@ -209,7 +312,10 @@ export default function HomeScreen() {
                 Daily Progress
               </Text>
             </View>
-            <TouchableOpacity className="p-2 bg-[#3da35d]/50 rounded-xl ml-2">
+            <TouchableOpacity
+              onPress={() => setNotificationModal(!notificationModal)}
+              className="p-2 bg-[#3da35d]/50 rounded-xl ml-2"
+            >
               <View className="relative w-7 h-7">
                 <Ionicons
                   name="notifications-outline"
@@ -271,78 +377,172 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </Link>
         </View>
-        {medications.length === 0 ? (
-          <View className="items-center">
-            <Ionicons name="medical-outline" size={48} color="#ccc" />
-            <Text className="text-[#666] text-base mt-2.5 mb-5">
-              No medications scheduled
-            </Text>
-            <Link href="/medications/add">
-              <TouchableOpacity className="bg-[#1a8e2d] px-8 py-4 rounded-lg">
-                <Text className="text-white font-semibold">
-                  Add Medications
-                </Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-        ) : (
-          medications.map((med: Medication) => (
-            <View
-              key={med.id}
-              className="flex-row items-center border-[1px] border-zinc-200 bg-white rounded-2xl p-4 mb-3 shadow-sm"
-            >
-              <View className="w-[50px] h-[50px] rounded-[35px] justify-center items-center mr-[15px]">
-                <Ionicons name="medical" size={24} color="#3da35d" />
-              </View>
-              <View className="flex-1 gap-2">
-                <View>
-                  <Text className="text-[#1a1a1a] text-base font-semibold">
-                    {med.name}
+        <View>
+          {/* <ScrollView
+          className="border-2 max-h-screen"
+          contentContainerStyle={{ paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={true}
+          // style={{ minHeight: 100, maxHeight: 500 }}
+          // scrollEnabled={true}
+        > */}
+          {medications.length === 0 ? (
+            <View className="items-center mt-10">
+              <Ionicons name="medkit-outline" size={48} color="#ccc" />
+              <Text className="text-[#666] text-base mt-2.5 mb-5">
+                No medications scheduled
+              </Text>
+              <Link className="w-full" href="/medications/add" asChild>
+                <TouchableOpacity className="bg-[#1a8e2d] w-[60%] flex items-center justify-center p-4 rounded-md">
+                  <Text className="text-white font-semibold">
+                    Add Medications
                   </Text>
-                  {/* <Text className="text-[#666] text-sm">{med.doses}</Text> */}
-                </View>
-                <View className="flex-row items-center">
-                  <Ionicons name="time-outline" size={16} color="#ccc" />
-                  <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
-                    {med.time}
-                  </Text>
-                </View>
-              </View>
-              {med.taken ? (
-                <TouchableOpacity
-                  onPress={() => handleMedToggle(med.id)}
-                  style={{
-                    // borderColor: "#3da35d",
-                    paddingVertical: 8,
-                    paddingHorizontal: 8,
-                    width: 90,
-                  }}
-                  className="flex-row gap-[0.5rem] items-center border-[1.3px] border-zinc-200 rounded-lg"
-                >
-                  <Ionicons
-                    name="checkmark-circle-outline"
-                    size={18}
-                    color="#3da35d"
-                  />
-                  <Text className="text-[#3da35d]">Taken</Text>
                 </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => handleMedToggle(med.id)}
-                  className="bg-[#3da35d]  border-[1.3px] border-[#3da35d] rounded-lg flex justify-center items-center"
-                  style={{
-                    paddingVertical: 8,
-                    paddingHorizontal: 8,
-                    width: 90,
-                  }}
-                >
-                  <Text className="text-white font-semibold">Take</Text>
-                </TouchableOpacity>
-              )}
+              </Link>
             </View>
-          ))
-        )}
+          ) : (
+            medications.map((med: Medication) => (
+              <View
+                key={med.id}
+                className="flex-row items-center border-[1px] border-zinc-200 bg-white rounded-2xl p-4 mb-3 shadow-sm"
+              >
+                <View
+                  className={`w-[50px] h-[50px] rounded-full justify-center items-center mr-[15px]`}
+                  style={{ backgroundColor: med.bgColor }}
+                >
+                  <Ionicons name="medical" size={24} color="#3da35d" />
+                </View>
+                <View className="flex-1 gap-2">
+                  <View>
+                    <Text className="text-[#1a1a1a] text-base font-semibold">
+                      {med.name}
+                    </Text>
+                    <Text className="text-[#666] text-sm">{med.doses}</Text>
+                  </View>
+                  <View className="flex-row items-center">
+                    <Ionicons name="time-outline" size={16} color="#ccc" />
+                    <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
+                      {med.time}
+                    </Text>
+                  </View>
+                </View>
+                {med.taken ? (
+                  <TouchableOpacity
+                    onPress={() => handleMedToggle(med.id)}
+                    style={{
+                      // borderColor: "#3da35d",
+                      paddingVertical: 8,
+                      paddingHorizontal: 8,
+                      width: 90,
+                    }}
+                    className="flex-row gap-[0.5rem] items-center border-[1.3px] border-zinc-200 rounded-full"
+                  >
+                    <Ionicons
+                      name="checkmark-circle-outline"
+                      size={18}
+                      color="#3da35d"
+                    />
+                    <Text className="text-[#3da35d]">Taken</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => handleMedToggle(med.id)}
+                    className="bg-[#3da35d]  border-[1.3px] border-[#3da35d] rounded-full flex justify-center items-center"
+                    style={{
+                      paddingVertical: 8,
+                      paddingHorizontal: 8,
+                      width: 90,
+                    }}
+                  >
+                    <Text className="text-white font-semibold">Take</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))
+          )}
+          {/* </ScrollView> */}
+        </View>
       </View>
+      <Modal
+        visible={notificationModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setNotificationModal(false)}
+      >
+        <Pressable
+          onPress={() => setNotificationModal(false)}
+          className="flex-1 w-full justify-end"
+        >
+          <Pressable
+            // onPress={(e) => e.stopPropagation()}
+            className="px-5 pt-5 pb-8 w-full h-fit max-h-[70%] bg-white rounded-t-3xl"
+          >
+            <View className="flex flex-row mb-1 justify-between">
+              <Text className="text-xl font-bold">Notifications</Text>
+              <TouchableOpacity onPress={() => setNotificationModal(false)}>
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+            <View className="w-full h-full">
+              {/* <ScrollView
+              scrollEnabled={true}
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              className="w-full h-full border-2 border-red-500"
+            > */}
+              {medications.length === 0 ? (
+                <View>
+                  <Text>No upcoming meds today.</Text>
+                </View>
+              ) : (
+                medications
+                  .filter((med) => !med.taken)
+                  .map((med) => (
+                    <View
+                      key={med.id}
+                      className="flex-row items-start justify-start border-[1px] border-zinc-200 bg-white rounded-2xl p-4 mt-3 shadow-sm"
+                    >
+                      <View
+                        className={`w-[50px] h-[50px] rounded-full justify-center items-center mr-[15px]`}
+                        style={{ backgroundColor: med.bgColor }}
+                      >
+                        <Ionicons name="medical" size={24} color="#3da35d" />
+                      </View>
+                      <View className="flex-1 flex-row justify-between items-start gap-2">
+                        <View>
+                          <Text className="text-[#1a1a1a] text-base font-semibold">
+                            {med.name}
+                          </Text>
+                          <Text className="text-[#666] text-sm">
+                            {med.doses}
+                          </Text>
+                        </View>
+                        <View className="flex-row items-center">
+                          <Ionicons
+                            name="time-outline"
+                            size={16}
+                            color="#ccc"
+                          />
+                          <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
+                            {med.time}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  ))
+              )}
+              {/* </ScrollView> */}
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+      {notificationModal && (
+        <TouchableOpacity
+          onPress={() => setNotificationModal(false)}
+          className="size-full absolute top-0 left-0  bg-black/40"
+        ></TouchableOpacity>
+      )}
     </ScrollView>
   );
 }

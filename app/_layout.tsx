@@ -12,7 +12,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: "white" },
           animation: "slide_from_right",
           header: () => null,
-          navigationBarHidden: true,
+          navigationBarHidden: false,
         }}
       >
         <Stack.Screen
@@ -21,6 +21,14 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="medications/add"
+          options={{
+            headerShown: false,
+            headerBackTitle: "",
+            title: "",
+          }}
+        ></Stack.Screen>
       </Stack>
     </>
   );

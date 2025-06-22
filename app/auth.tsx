@@ -35,6 +35,7 @@ export default function AuthScreen() {
         promptMessage: "Authenticate to access your health data",
         fallbackLabel: "Use PIN",
       });
+      // const auth = { success: true };
 
       if (auth.success) {
         router.replace("/home");

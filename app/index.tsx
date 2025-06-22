@@ -23,6 +23,9 @@ export default function SplashScreen() {
       }),
     ]).start();
 
+    // const timer = setTimeout(() => {
+    //   router.replace("/medications/add");
+    // }, 500);
     const timer = setTimeout(() => {
       router.replace("/auth");
     }, 2000);
