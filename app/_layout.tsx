@@ -1,6 +1,11 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "../global.css";
+import Toast from "react-native-toast-message";
+// import CustomToast from "@/components/other/CustomToast";
+// import { ToastConfig, BaseToastProps } from "react-native-toast-message";
+
+import { toastConfig } from "@/utils/toastConfig";
 
 export default function RootLayout() {
   return (
@@ -14,25 +19,73 @@ export default function RootLayout() {
           header: () => null,
           navigationBarHidden: false,
         }}
-      >
-        <Stack.Screen
-          name="index"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="medications/add"
-          options={{
-            headerShown: false,
-            headerBackTitle: "",
-            title: "",
-          }}
-        ></Stack.Screen>
-      </Stack>
+      />
+      <Toast config={toastConfig} />
     </>
   );
 }
+
+//WORKING
+// import { Stack } from "expo-router";
+// import { StatusBar } from "expo-status-bar";
+// import "../global.css";
+// import Toast from "react-native-toast-message";
+
+// export default function RootLayout() {
+//   return (
+//     <>
+//       <StatusBar style="light" />
+//       <Stack
+//         screenOptions={{
+//           headerShown: false,
+//           contentStyle: { backgroundColor: "white" },
+//           animation: "slide_from_right",
+//           header: () => null,
+//           navigationBarHidden: false,
+//         }}
+//       />
+//       <Toast />
+//     </>
+//   );
+// }
+
+// import { Stack } from "expo-router";
+// import { StatusBar } from "expo-status-bar";
+// import "../global.css";
+// import Toast from 'react-native-toast-message'
+
+// export default function RootLayout() {
+//   return (
+//     <>
+//       <StatusBar style="light" />
+//       <Stack
+//         screenOptions={{
+//           headerShown: false,
+//           contentStyle: { backgroundColor: "white" },
+//           animation: "slide_from_right",
+//           header: () => null,
+//           navigationBarHidden: false,
+//         }}
+//       >
+//         <Stack.Screen
+//           name="index"
+//           options={{
+//             headerShown: false,
+//           }}
+//         />
+//         <Stack.Screen
+//           name="medications/add"
+//           options={{
+//             headerShown: false,
+//             headerBackTitle: "",
+//             title: "",
+//           }}
+//         ></Stack.Screen>
+//       </Stack>
+//       <Toast />
+//     </>
+//   );
+// }
 
 // import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 // import { useFonts } from 'expo-font';

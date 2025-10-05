@@ -22,6 +22,11 @@ import {
 // import { typePageCounter } from "../types/typePageCounter";
 import { brandColors } from "@/constants/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import { addMedData } from "@/utils/storage";
+import Toast from "react-native-toast-message";
+import { scheduleMedicationReminder } from "@/utils/notification";
+import { displayIcons } from "@/utils/displayIcons";
 
 type typeMedicineProp = {
   medFinal: typeMedicine;
@@ -40,6 +45,7 @@ const MedFinal = ({
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   //   const [bgColor, setBgColor] = useState<string>(medColor[0].color);
   const [medIcon, setMedIcon] = useState<string>("Tablet");
+  const router = useRouter();
   //   const [pageCount, setPageCount] = useState<number>(1);
   //   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   //   const [showTimePicker, setShowTimePicker] = useState<string | null>(null);
@@ -52,35 +58,38 @@ const MedFinal = ({
   type MCIIcons = "liquid-spot" | "dots-horizontal";
   type FontistoIcons = "injection-syringe";
 
-  const displayIcons = (iconPackage: string, icon: string) => {
-    const iconSize = 44;
-    const iconColor = brandColors.white;
-    switch (iconPackage) {
-      case "FontAwesome6":
-        return <FontAwesome6 name={icon} size={iconSize} color={iconColor} />;
-      case "MaterialCommunityIcons":
-        return (
-          <MaterialCommunityIcons
-            name={icon as MCIIcons}
-            size={iconSize}
-            color={iconColor}
-          />
-        );
-      case "Fontisto":
-        return (
-          <Fontisto
-            name={icon as FontistoIcons}
-            size={iconSize}
-            color={iconColor}
-          />
-        );
-      // return <Fontisto name={icon} size={iconSize} color={iconColor}/>;
-      case "FontAwesome5":
-        return <FontAwesome5 name={icon} size={iconSize} color={iconColor} />;
-      default:
-        return <Ionicons name="medical" size={iconSize} color={iconColor} />;
-    }
-  };
+  // const displayIcons = (
+  //   iconPackage: string | undefined,
+  //   icon: string | undefined
+  // ) => {
+  //   const iconSize = 44;
+  //   const iconColor = brandColors.white;
+  //   switch (iconPackage) {
+  //     case "FontAwesome6":
+  //       return <FontAwesome6 name={icon} size={iconSize} color={iconColor} />;
+  //     case "MaterialCommunityIcons":
+  //       return (
+  //         <MaterialCommunityIcons
+  //           name={icon as MCIIcons}
+  //           size={iconSize}
+  //           color={iconColor}
+  //         />
+  //       );
+  //     case "Fontisto":
+  //       return (
+  //         <Fontisto
+  //           name={icon as FontistoIcons}
+  //           size={iconSize}
+  //           color={iconColor}
+  //         />
+  //       );
+  //     // return <Fontisto name={icon} size={iconSize} color={iconColor}/>;
+  //     case "FontAwesome5":
+  //       return <FontAwesome5 name={icon} size={iconSize} color={iconColor} />;
+  //     default:
+  //       return <Ionicons name="medical" size={iconSize} color={iconColor} />;
+  //   }
+  // };
 
   const validateForm = () => {
     return (
@@ -96,12 +105,26 @@ const MedFinal = ({
       //   setCount(1);
       // setCount(count + 1);
 
-      try {
-        const medicationJson = JSON.stringify(medFinal);
-        await AsyncStorage.setItem("@medicationData", medicationJson);
-        console.log("Medication added successfully.");
-      } catch (error) {
-        console.log("Failed to add medication.");
+      const checkAdded = await addMedData(medFinal); //without the await it will always be true as even an empty
+      // promise is truthy i.e. Promise<void> is truth as well so it will alwyas navigate to home page regardless of returned value
+
+      if (medFinal.reminder) {
+        await scheduleMedicationReminder(medFinal);
+      }
+
+      if (checkAdded) {
+        Toast.show({
+          type: "success",
+          text1: "Medication added successfully.",
+          position: "bottom",
+        });
+        router.push("/home");
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Something went wrong. Please try again.",
+          position: "bottom",
+        });
       }
     }
   };
@@ -117,12 +140,21 @@ const MedFinal = ({
               style={{ backgroundColor: medFinal.color }}
               className={`size-36 rounded-full flex items-center self-center justify-center`}
             >
-              {medTypes.map((med) => (
+              <View>
+                {displayIcons(
+                  medFinal.iconPackage,
+                  medFinal.icon,
+                  40,
+                  brandColors.white
+                )}
+              </View>
+
+              {/* {medTypes.map((med) => (
                 <View key={med.id}>
                   {med.name === medFinal.type &&
                     displayIcons(med.iconPackage, med.icon)}
                 </View>
-              ))}
+              ))} */}
             </View>
             <View className="flex gap-2 mt-3 px-2">
               <View className="flex mt-1 flex-row justify-between">
@@ -151,11 +183,11 @@ const MedFinal = ({
                     </Text>
                   </View>
                 </View>
-                {medFinal.duration && (
+                {/* {medFinal.duration && (
                   <Text className="font-medium text-zinc-500">
                     ({medFinal.duration} days)
                   </Text>
-                )}
+                )} */}
               </View>
               <View className="w-full h-[1px] bg-zinc-200/60" />
               <View className="flex gap-3">
@@ -176,7 +208,7 @@ const MedFinal = ({
                           />
                         </View>
                         <Text className="font-medium">
-                          {medFinal.time[index] || "N/A"}
+                          {medFinal.time[index].medTime || "N/A"}
                         </Text>
                       </View>
                     </View>

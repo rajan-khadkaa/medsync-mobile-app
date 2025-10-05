@@ -35,6 +35,50 @@ const frequencies = [
 //   { id: "5", label: "Ongoing", value: -1 },
 // ];
 
+const boxColor = "#DAEBDF";
+const boxColor2 = "#DAEBDF";
+// const boxColor = "#E8F3EB";
+// const boxColor2 = "#E8F3EB";
+
+const actions = [
+  {
+    icon: "add-circle-outline" as const,
+    label: "Add Medications",
+    // label: "Add\nMedications",
+    route: "/medications/add" as const,
+    color: "#2e7d32",
+    gradient: [boxColor, boxColor2] as [string, string],
+    // gradient: ["#4caf50", "#2e7d32"] as [string, string],
+  },
+  {
+    icon: "calendar-outline" as const,
+    label: "Calendar View",
+    // label: "Calendar\nView",
+    route: "/calendar" as const,
+    color: "#1976d2",
+    gradient: [boxColor, boxColor2] as [string, string],
+    // gradient: ["#2196f3", "#1976d2"] as [string, string],
+  },
+  // {
+  //   icon: "time-outline" as const,
+  //   label: "History Log",
+  //   // label: "History\nLog",
+  //   route: "/history" as const,
+  //   color: "#c21858",
+  //   gradient: [boxColor, boxColor2] as [string, string],
+  //   // gradient: ["#e91e63", "#c21858"] as [string, string],
+  // },
+  // {
+  //   icon: "medical-outline" as const,
+  //   label: "Refill Tracker",
+  //   // label: "Refill\nTracker",
+  //   route: "/refill" as const,
+  //   color: "#e64a19",
+  //   gradient: [boxColor, boxColor2] as [string, string],
+  //   // gradient: ["#ff5722", "#e64a19"] as [string, string],
+  // },
+];
+
 const units = [
   {
     id: 1,
@@ -113,42 +157,64 @@ const medTypes = [
   },
 ];
 
-const duration = [
+// const duration = [
+//   {
+//     id: 1,
+//     day: 1,
+//     title: 1,
+//     info: "day",
+//   },
+//   {
+//     id: 2,
+//     day: 7,
+//     title: "1",
+//     info: "week",
+//   },
+//   {
+//     id: 3,
+//     day: 14,
+//     title: "2",
+//     info: "weeks",
+//   },
+//   {
+//     id: 4,
+//     day: 30,
+//     title: "1",
+//     info: "month",
+//   },
+//   {
+//     id: 5,
+//     day: 180,
+//     title: "6",
+//     info: "months",
+//   },
+//   {
+//     id: 6,
+//     day: -1,
+//     title: "--",
+//     info: "Ongoing",
+//   },
+// ];
+const medFreq = [
   {
     id: 1,
-    day: 1,
-    title: 1,
-    info: "day",
+    frequency: "Daily",
   },
   {
     id: 2,
-    day: 7,
-    title: "1",
-    info: "week",
+    frequency: "Weekly",
   },
   {
     id: 3,
-    day: 14,
-    title: "2",
-    info: "weeks",
+    frequency: "Monthly",
   },
   {
     id: 4,
-    day: 30,
-    title: "1",
-    info: "month",
+    frequency: "Yearly",
   },
   {
     id: 5,
-    day: 180,
-    title: "6",
-    info: "months",
-  },
-  {
-    id: 6,
-    day: -1,
-    title: "--",
-    info: "Ongoing",
+    frequency: "Once",
   },
 ];
 
@@ -211,4 +277,97 @@ const medColor = [
   },
 ];
 
-export { frequencies, duration, units, medTypes, medColor };
+const dummyData = [
+  {
+    id: "1",
+    name: "Aspirin",
+    doses: "81mg", // Heart health
+    time: "8:00 AM",
+    bgColor: "#D4EDDA", // Soft mint
+    taken: true,
+    icon: "heart-outline", // Ionicons
+  },
+  {
+    id: "2",
+    name: "Ibuprofen",
+    doses: "200mg", // Pain/fever
+    time: "12:00 PM",
+    bgColor: "#FFF3CD", // Pale butter
+    taken: false,
+    icon: "flame-outline",
+  },
+  {
+    id: "3",
+    name: "Vitamin D3",
+    doses: "1000 IU", // Bone health
+    time: "10:00 AM",
+    bgColor: "#D1E7FF", // Washed sky blue
+    taken: false,
+    icon: "sunny-outline",
+  },
+  {
+    id: "4",
+    name: "Paracetamol",
+    doses: "500mg", // Painkiller
+    time: "3:00 PM",
+    bgColor: "#FFE8E8", // Blush pink
+    taken: false,
+    icon: "medkit-outline",
+  },
+  {
+    id: "5",
+    name: "Omeprazole",
+    doses: "20mg", // Acid reflux
+    time: "7:00 AM",
+    bgColor: "#E8F4F8", // Frosted teal
+    taken: false,
+    icon: "shield-checkmark-outline",
+  },
+  {
+    id: "6",
+    name: "Metformin",
+    doses: "500mg", // Diabetes
+    time: "6:00 PM",
+    bgColor: "#F0E6FF", // Lavender mist
+    taken: false,
+    icon: "pulse-outline",
+  },
+  {
+    id: "7",
+    name: "Cetirizine",
+    doses: "10mg", // Allergies
+    time: "9:00 PM",
+    bgColor: "#FFEDD5", // Peach cream
+    taken: false,
+    icon: "flower-outline",
+  },
+  {
+    id: "8",
+    name: "Atorvastatin",
+    doses: "20mg", // Cholesterol
+    time: "8:00 PM",
+    bgColor: "#E0F2F1", // Seafoam
+    taken: false,
+    icon: "water-outline",
+  },
+  {
+    id: "9",
+    name: "Levothyroxine",
+    doses: "50mcg", // Thyroid
+    time: "6:00 AM",
+    bgColor: "#F5E6FF", // Lilac haze
+    taken: false,
+    icon: "git-branch-outline",
+  },
+  {
+    id: "10",
+    name: "Amoxicillin",
+    doses: "500mg", // Antibiotic
+    time: "2:00 PM",
+    bgColor: "#FFE5D9", // Barely-there coral
+    taken: false,
+    icon: "bug-outline",
+  },
+];
+
+export { frequencies, actions, medFreq, units, medTypes, medColor, dummyData };

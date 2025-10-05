@@ -1,5 +1,12 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  BackHandler,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import MedInfo from "@/components/pages/MedInfo";
@@ -10,25 +17,64 @@ import MedNotify from "@/components/pages/MedNotify";
 import { typeMedicine } from "@/components/types/typeMedicine";
 import MedFinal from "@/components/pages/MedFinal";
 import { brandColors } from "@/constants/Colors";
+import HeaderBar from "@/components/other/HeaderBar";
+import { router, usePathname } from "expo-router";
+import { useFormPageBackHook } from "@/utils/formPageBackHandler";
 
 const AddMedicationScreen = () => {
+  const pathname = usePathname();
   const [pageCount, setPageCount] = useState<number>(1);
   const currentTime = `${new Date().getHours()}:${new Date().getMinutes()}`;
 
   const [medicineInfo, setMedicineInfo] = useState<typeMedicine>({
+    id: "",
     name: "",
     strength: null,
     unit: "",
     type: "",
-    duration: null,
+    icon: "",
+    iconPackage: "",
+    // icon: "medical",
+    // iconPackage: "Ionicons",
+    // duration: null,
+    frequency: "Daily",
     date: new Date(),
-    time: [currentTime],
+    time: [{ medTime: currentTime, taken: false }],
     // time: ["10:00", "11:00"],
     color: "#26A69A",
     reminder: false,
     refill: false,
     description: "",
   });
+
+  useFormPageBackHook();
+
+  // useEffect(() => {
+  //   if (pathname !== "/medications/add") return;
+  //   const backAction = () => {
+  //     Alert.alert(
+  //       "Go Back?",
+  //       "Going back will reset all medication data filled on the form.",
+  //       [
+  //         {
+  //           text: "Yes, Go Back",
+  //           onPress: () => router.back(),
+  //         },
+  //         {
+  //           text: "Cancel",
+  //           onPress: () => {},
+  //         },
+  //       ]
+  //     );
+  //     return true;
+  //   };
+
+  //   const exitPage = BackHandler.addEventListener(
+  //     "hardwareBackPress",
+  //     backAction
+  //   );
+  //   return () => exitPage.remove();
+  // }, []);
 
   return (
     <View className="flex-1 relative">
@@ -38,26 +84,7 @@ const AddMedicationScreen = () => {
         end={{ x: 1, y: 1 }}
       />
       <View className="flex-1 justify-between">
-        <View className="brand-bg flex-row items-end h-24">
-          <View className="flex-row items-center gap-2 mb-4">
-            <TouchableOpacity className=" p-1 flex items-center justify-center rounded-full">
-              {/* <TouchableOpacity className="bg-white p-1 flex items-center justify-center rounded-full"> */}
-              <Ionicons
-                name="chevron-back"
-                size={20}
-                color={brandColors.white}
-              />
-              {/* <Ionicons
-              name="chevron-back"
-              size={20}
-              color={brandColors.primary}
-            /> */}
-            </TouchableOpacity>
-            <Text className="text-white text-lg font-medium">
-              New Medication
-            </Text>
-          </View>
-        </View>
+        <HeaderBar title="Add Medication" formPage={true} />
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {pageCount === 1 && (
@@ -78,8 +105,8 @@ const AddMedicationScreen = () => {
           )}
           {pageCount === 3 && (
             <MedSchedule
-              medDuration={medicineInfo}
-              setMedDuration={setMedicineInfo}
+              medFrequency={medicineInfo}
+              setMedFrequency={setMedicineInfo}
               count={pageCount}
               setCount={setPageCount}
             />

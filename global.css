@@ -21,6 +21,10 @@
     /* @apply bg-[#c9edd5]; */
   }
 
+  .surface-bdr {
+    @apply border-[#d4f1de] border-[1.5px];
+  }
+
   .brand-text {
     @apply text-[#3da35d];
   }

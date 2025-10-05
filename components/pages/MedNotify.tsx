@@ -41,7 +41,10 @@ const MedNotify = ({
   type MCIIcons = "liquid-spot" | "dots-horizontal";
   type FontistoIcons = "injection-syringe";
 
-  const displayIcons = (iconPackage: string, icon: string) => {
+  const displayIcons = (
+    iconPackage: string | undefined,
+    icon: string | undefined
+  ) => {
     const iconSize = 44;
     const iconColor = brandColors.white;
     switch (iconPackage) {
@@ -99,12 +102,17 @@ const MedNotify = ({
               style={{ backgroundColor: medNotify.color }}
               className={`size-36 rounded-full flex items-center justify-center`}
             >
-              {medTypes.map((med) => (
+              <View>
+                {/* { (med.name === medNotify.type ||
+                    medNotify.icon === "medical") && */}
+                {displayIcons(medNotify.iconPackage, medNotify.icon)}
+              </View>
+              {/* {medTypes.map((med) => (
                 <View key={med.id}>
                   {med.name === medNotify.type &&
                     displayIcons(med.iconPackage, med.icon)}
                 </View>
-              ))}
+              ))} */}
 
               {/* <Ionicons name="add-circle" size={52} color={brandColors.white} /> */}
             </View>

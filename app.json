@@ -4,7 +4,7 @@
     "slug": "Medsync",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/medsyncLogo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -12,9 +12,16 @@
       "supportsTablet": true
     },
     "android": {
+      "permissions": ["NOTIFICATIONS", "SCHEDULE_EXACT_ALARM"],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/medsyncLogo.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.rajankhadka.medsync",
+      "notification": {
+        "icon": "./assets/images/medsyncLogo.png",
+        "color": "#ffffff",
+        "sounds": ["./assets/sounds/medsync-notification.wav"]
       }
     },
     "web": {
@@ -32,10 +39,31 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "useNextNotificationsApi": true
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "0fee1212-1d67-45b3-aedd-935957265340"
+      }
+    },
+    "owner": "rajan_khadka",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0fee1212-1d67-45b3-aedd-935957265340"
     }
   }
 }

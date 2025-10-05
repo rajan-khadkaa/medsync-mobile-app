@@ -11,7 +11,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { units } from "@/constants/Values";
 import { typeMedicine } from "../types/typeMedicine";
 import PrimaryBtn from "../other/PrimaryBtn";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
+import {
+  formPageBackAction,
+  useFormPageBackHook,
+} from "@/utils/formPageBackHandler";
 
 type typeMedicineProp = {
   medInfo: typeMedicine;
@@ -29,11 +33,16 @@ const MedInfo = ({
   const router = useRouter();
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
+  const pathname = usePathname();
+
+  useFormPageBackHook();
+
   const validateForm = () => {
     return (
-      (medInfo.name?.trim()?.length || 0) > 0 && // empty check if '' is the value then .trim='', .length=0, ||0=0, so at last >0 checks the value is atleast one character or length
-      medInfo.strength !== null && // Strength is a number
-      medInfo.unit !== "" // Unit is selected
+      (medInfo.name?.trim()?.length || 0) > 0
+      // && // empty check if '' is the value then .trim='', .length=0, ||0=0, so at last >0 checks the value is atleast one character or length
+      // medInfo.strength !== null && // Strength is a number
+      // medInfo.unit !== "" // Unit is selected
       // true
     );
   };
@@ -46,7 +55,7 @@ const MedInfo = ({
 
   return (
     <View className="body-padding">
-      <Text className="head-title">Enter Your Medication Info</Text>
+      <Text className="head-title">Enter Your Medication Information</Text>
       <View className="flex flex-col gap-5">
         <View>
           <Text className="form-label">Medication Name</Text>
@@ -112,7 +121,7 @@ const MedInfo = ({
           />
           <TouchableOpacity
             className={`border-[1.5px] border-zinc-300 rounded-lg py-3`}
-            onPress={() => router.push("/home")}
+            onPress={() => formPageBackAction(pathname)}
           >
             <Text className="text-zinc-800 text-center font-medium text-lg">
               Cancel

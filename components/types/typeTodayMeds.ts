@@ -1,6 +1,6 @@
 import { typeDoseTime } from "./typeDoseTime";
 
-export type typeMedicine = {
+export type typeTodayMeds = {
   id: string;
   name: string;
   description?: string;
@@ -12,7 +12,8 @@ export type typeMedicine = {
   // duration?: number | null;
   frequency?: string;
   date: Date;
-  time: typeDoseTime[];
+  medTime: string;
+  taken: boolean;
   // time: string[];
   color: string;
   reminder: boolean;

@@ -31,10 +31,11 @@ const MedType = ({
   setCount,
 }: typeMedicineProp) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [moreForms, setMoreForms] = useState<boolean>(false);
 
   const validateForm = () => {
-    return medType.type;
-    // return true;
+    // return medType.type;
+    return true;
   };
 
   const handleNext = () => {
@@ -93,7 +94,12 @@ const MedType = ({
                   med.id === 4 ? "border-none" : "border-b-[1px]"
                 } h-16 border-zinc-200/80 flex flex-row items-center justify-between`}
                 onPress={() =>
-                  setMedType((prev) => ({ ...prev, type: med.name }))
+                  setMedType((prev) => ({
+                    ...prev,
+                    type: med.name,
+                    iconPackage: med.iconPackage,
+                    icon: med.icon,
+                  }))
                 }
               >
                 <View className="flex flex-row items-center gap-3">
@@ -112,38 +118,80 @@ const MedType = ({
               </Pressable>
             ))}
           </View>
-        </View>
-        {/* More forms/types */}
-        <View>
-          <Text className="body-title">More Forms</Text>
-          <View className="px-4 bg-zinc-50 border-[1.5px] border-zinc-100 rounded-lg">
-            {medTypes.slice(4).map((med) => (
+          {!moreForms && (
+            <View className="mt-3">
               <Pressable
-                key={med.id}
-                className={` ${
-                  med.id === 11 ? "border-none" : "border-b-[1px]"
-                } h-16 border-zinc-200/80 flex flex-row items-center justify-between`}
-                onPress={() =>
-                  setMedType((prev) => ({ ...prev, type: med.name }))
-                }
+                className="flex-row gap-1 align-middle"
+                onPress={() => setMoreForms(true)}
               >
-                <View className="flex flex-row items-center gap-3">
-                  <View className="brand-surface rounded-xl size-10 flex items-center justify-center p-2">
-                    {displayIcons(med.iconPackage, med.icon)}
+                <Text className="text-sm font-semibold text-green-600">
+                  Show more forms
+                </Text>
+                <Ionicons
+                  name="chevron-down-circle-outline"
+                  size={18}
+                  color="#3da35d"
+                />
+              </Pressable>
+            </View>
+          )}
+        </View>
+
+        {/* More forms/types */}
+        {moreForms && (
+          <View>
+            <Text className="body-title">More Forms</Text>
+            <View className="px-4 bg-zinc-50 border-[1.5px] border-zinc-100 rounded-lg">
+              {medTypes.slice(4).map((med) => (
+                <Pressable
+                  key={med.id}
+                  className={` ${
+                    med.id === 11 ? "border-none" : "border-b-[1px]"
+                  } h-16 border-zinc-200/80 flex flex-row items-center justify-between`}
+                  onPress={() =>
+                    setMedType((prev) => ({
+                      ...prev,
+                      type: med.name,
+                      iconPackage: med.iconPackage,
+                      icon: med.icon,
+                    }))
+                  }
+                >
+                  <View className="flex flex-row items-center gap-3">
+                    <View className="brand-surface rounded-xl size-10 flex items-center justify-center p-2">
+                      {displayIcons(med.iconPackage, med.icon)}
+                    </View>
+                    <Text>{med.name}</Text>
                   </View>
-                  <Text>{med.name}</Text>
-                </View>
-                {med.name === medType.type && (
+                  {med.name === medType.type && (
+                    <Ionicons
+                      name="checkmark-circle-outline"
+                      size={24}
+                      color="#3da35d"
+                    />
+                  )}
+                </Pressable>
+              ))}
+            </View>
+            {moreForms && (
+              <View className="mt-3">
+                <Pressable
+                  className="flex-row gap-1 align-middle"
+                  onPress={() => setMoreForms(false)}
+                >
+                  <Text className="text-sm font-semibold text-green-600">
+                    Show less forms
+                  </Text>
                   <Ionicons
-                    name="checkmark-circle-outline"
-                    size={24}
+                    name="chevron-up-circle-outline"
+                    size={18}
                     color="#3da35d"
                   />
-                )}
-              </Pressable>
-            ))}
+                </Pressable>
+              </View>
+            )}
           </View>
-        </View>
+        )}
         <View className="w-full flex gap-2">
           {/* <View className="w-full"> */}
           <PrimaryBtn
