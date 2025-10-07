@@ -1,4 +1,4 @@
-import { typeDoseTime } from "./typeDoseTime";
+// import { typeDoseTime } from "./typeDoseTime";
 
 export type typeMedicine = {
   id: string;
@@ -10,10 +10,10 @@ export type typeMedicine = {
   icon?: string;
   iconPackage?: string;
   // duration?: number | null;
-  frequency?: string;
+  frequency: string;
   date: Date;
-  time: typeDoseTime[];
-  // time: string[];
+  // time: typeDoseTime[];
+  time: string[];
   color: string;
   reminder: boolean;
   refill: boolean;

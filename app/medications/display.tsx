@@ -7,6 +7,7 @@ import {
   Fontisto,
   Ionicons,
   MaterialCommunityIcons,
+  Octicons,
 } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { dummyData } from "@/constants/Values";
@@ -65,7 +66,7 @@ const DisplayMedicationScreen = () => {
     try {
       const medicationData = await getMedData();
       setMedData(medicationData);
-      // console.log("med data from storage: ", medicationData);
+      // console.log("ALL med data from storage on UI: ", medicationData);
     } catch (error) {
       console.error("Failed to fetch med data:", error);
     }
@@ -205,11 +206,13 @@ const DisplayMedicationScreen = () => {
             // nestedScrollEnabled={true}
           >
             {medData.length === 0 ? (
-              <View className="items-center mt-10">
-                <Ionicons name="medkit-outline" size={48} color="#ccc" />
-                <Text className="text-[#666] text-base mt-2.5 mb-5">
-                  No medications scheduled
-                </Text>
+              <View className="items-center justify-between h-[85vh]">
+                <View className="items-center mt-44">
+                  <Octicons name="clock" size={52} color="#ccc" />
+                  <Text className="text-[#666] text-base mt-4 font-medium mb-5">
+                    No medication scheduled
+                  </Text>
+                </View>
                 <Link className="w-full" href="/medications/add" asChild>
                   <TouchableOpacity className="bg-[#1a8e2d] w-[60%] flex items-center justify-center p-4 rounded-md">
                     <Text className="text-white font-semibold">
@@ -252,7 +255,7 @@ const DisplayMedicationScreen = () => {
                               color="#ccc"
                             />
                             <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
-                              {item.medTime}
+                              {item}
                             </Text>
                           </View>
                         ))}

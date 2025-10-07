@@ -208,7 +208,7 @@ const MedFinal = ({
                           />
                         </View>
                         <Text className="font-medium">
-                          {medFinal.time[index].medTime || "N/A"}
+                          {medFinal.time[index] || "N/A"}
                         </Text>
                       </View>
                     </View>

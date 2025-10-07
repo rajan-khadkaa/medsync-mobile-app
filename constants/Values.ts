@@ -79,6 +79,27 @@ const actions = [
   // },
 ];
 
+const homeActions = [
+  {
+    icon: "add-circle-outline" as const,
+    label: "All Medications",
+    // label: "Add\nMedications",
+    route: "/medications/display" as const,
+    color: "#2e7d32",
+    gradient: [boxColor, boxColor2] as [string, string],
+    // gradient: ["#4caf50", "#2e7d32"] as [string, string],
+  },
+  {
+    icon: "calendar-outline" as const,
+    label: "Medication History",
+    // label: "Calendar\nView",
+    route: "/medications/history" as const,
+    color: "#1976d2",
+    gradient: [boxColor, boxColor2] as [string, string],
+    // gradient: ["#2196f3", "#1976d2"] as [string, string],
+  },
+];
+
 const units = [
   {
     id: 1,
@@ -370,4 +391,13 @@ const dummyData = [
   },
 ];
 
-export { frequencies, actions, medFreq, units, medTypes, medColor, dummyData };
+export {
+  frequencies,
+  actions,
+  homeActions,
+  medFreq,
+  units,
+  medTypes,
+  medColor,
+  dummyData,
+};

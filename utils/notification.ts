@@ -107,7 +107,7 @@ export const scheduleMedicationReminder = async (
     const frequencyOfMed: string | undefined = medication.frequency;
 
     for (const eachTime of medication.time) {
-      const [hours, minutes] = eachTime.medTime.split(":").map(Number);
+      const [hours, minutes] = eachTime.split(":").map(Number);
       // if (isNaN(hours) || isNaN(minutes)) continue;
 
       const now = new Date();

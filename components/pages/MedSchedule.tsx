@@ -54,7 +54,7 @@ const MedSchedule = ({
 
   const showTime = (index: number) => {
     const date = new Date();
-    const stringDate = medFrequency.time[index].medTime.split(":"); //contains ['10','00']
+    const stringDate = medFrequency.time[index].split(":"); //contains ['10','00']
     const [hour, minute] = stringDate.map((val) => Number(val)); //this now contains number [10, 00] i.e. hour=10, minute=00
     date.setHours(hour, minute, 0, 0);
     return date;
@@ -78,7 +78,7 @@ const MedSchedule = ({
       // const checkTime = medFrequency.time.includes(formattedTime);
 
       const checkTime = medFrequency.time.some(
-        (time) => time.medTime === formattedTime
+        (time) => time === formattedTime
       );
 
       const formattedTime = `${hour}:${minute}`;
@@ -90,8 +90,7 @@ const MedSchedule = ({
         setMedFrequency((prev) => {
           const replacedTime = [...prev.time];
           // console.log("spreading existing times array: ", replacedTime);
-          replacedTime[index].medTime = formattedTime;
-          replacedTime[index].taken = false;
+          replacedTime[index] = formattedTime;
           // console.log("spreading newly added times array: ", replacedTime);
           return {
             ...prev,
@@ -105,7 +104,7 @@ const MedSchedule = ({
   const handleRemoveTime = (item: string) => {
     if (item) {
       const filteredTime = medFrequency.time.filter(
-        (timeObj) => timeObj.medTime !== item
+        (timeObj) => timeObj !== item
       );
 
       setMedFrequency((prev) => ({ ...prev, time: filteredTime }));
@@ -121,7 +120,7 @@ const MedSchedule = ({
       // const checkTime = medFrequency.time.includes(formattedTime);
 
       const checkTime = medFrequency.time.some(
-        (time) => time.medTime === formattedTime
+        (time) => time === formattedTime
       );
       // console.log("does item exist already? ", checkTime);
       // console.log("index of time picked: ", index);
@@ -131,7 +130,7 @@ const MedSchedule = ({
         setMedFrequency((prev) => {
           return {
             ...prev,
-            time: [...prev.time, { medTime: formattedTime, taken: false }],
+            time: [...prev.time, formattedTime],
           };
         });
       } else {
@@ -273,7 +272,7 @@ const MedSchedule = ({
                           <TouchableOpacity
                             onPress={(event) => {
                               event.stopPropagation();
-                              handleRemoveTime(item.medTime);
+                              handleRemoveTime(item);
                             }}
                             className="bg-red-100 rounded-full"
                           >
@@ -286,16 +285,14 @@ const MedSchedule = ({
                         </View>
                         <TouchableOpacity
                           key={index}
-                          onPress={() => setShowTimePicker(item.medTime)}
+                          onPress={() => setShowTimePicker(item)}
                           className="rounded-md py-[0.37rem] bg-zinc-200 px-3"
                         >
-                          <Text>
-                            {medFrequency.time[index].medTime || "N/A"}
-                          </Text>
+                          <Text>{medFrequency.time[index] || "N/A"}</Text>
                         </TouchableOpacity>
                       </View>
 
-                      {showTimePicker === item.medTime && (
+                      {showTimePicker === item && (
                         <DateTimePicker
                           value={showTime(index)}
                           mode="time"

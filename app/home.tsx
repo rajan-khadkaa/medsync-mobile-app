@@ -1,10 +1,15 @@
 import { typeMedicine } from "@/components/types/typeMedicine";
 import { typeTodayMeds } from "@/components/types/typeTodayMeds";
 import { brandColors } from "@/constants/Colors";
-import { actions, dummyData } from "@/constants/Values";
+import { actions, dummyData, homeActions } from "@/constants/Values";
 import { displayIcons } from "@/utils/displayIcons";
-import { getMedData, getTodayMeds, medTakenToggle } from "@/utils/storage";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  clearAllData,
+  getMedData,
+  getTodayMeds,
+  medTakenToggle,
+} from "@/utils/storage";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
@@ -37,12 +42,15 @@ function CircularProgress({
   completedDoses,
 }: CircularProgressProps) {
   const animationValue = useRef(new Animated.Value(0)).current;
-  const size = width * 0.55;
-  const strokeWidth = 30;
+  const size = width * 0.48;
+  // const size = width * 0.55;
+  const strokeWidth = 18;
+  // const strokeWidth = 28;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
   useEffect(() => {
+    // clearAllData();
     Animated.timing(animationValue, {
       toValue: progress,
       duration: 1000,
@@ -109,14 +117,22 @@ export default function HomeScreen() {
     try {
       const medicationData = await getTodayMeds();
       setTodayMedData(medicationData);
-      // console.log("med data from storage: ", medicationData);
+      console.log(
+        "todays med data from storage on home page: ",
+        medicationData
+      );
     } catch (error) {
       console.error("Failed to fetch med data:", error);
     }
   };
 
   //NEED TO REWRITE THIS LOGIC TO TOGGLE MED TAKEN / NOT-TAKEN
-  const handleMedToggle = async (id: string, time: string, taken: boolean) => {
+  const handleMedToggle = async (
+    id: string,
+    time: string,
+    taken: boolean,
+    date: Date
+  ) => {
     // console.log('medication by default is: ', )
     if (taken) {
       Alert.alert(
@@ -130,14 +146,18 @@ export default function HomeScreen() {
           {
             text: "Mark as not taken",
             onPress: async () => {
-              const medication = await medTakenToggle(id, time);
+              const medication = await medTakenToggle(
+                id,
+                date.toDateString(),
+                time
+              );
               fetchData();
             },
           },
         ]
       );
     } else {
-      const medication = await medTakenToggle(id, time);
+      await medTakenToggle(id, date.toDateString(), time);
       fetchData();
     }
 
@@ -189,12 +209,12 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <LinearGradient
-          className="pt-[50px] pb-[25px] rounded-b-[3rem] overflow-hidden"
+          className="pt-[45px] pb-[25px] rounded-b-[3rem] overflow-hidden"
           colors={["#3da35d", "#3da35d"]}
           // colors={["#3fa34d", "#3fa34d"]}
         >
-          <View className="items-center px-5">
-            <View className="flex-row items-center justify-center w-full mb-5">
+          <View className="items-center px-5 py-1">
+            <View className="flex-row items-center justify-center w-full mb-4">
               <View className="flex-1">
                 <Text className="font-semibold text-white text-2xl">
                   Daily progress
@@ -259,37 +279,68 @@ export default function HomeScreen() {
           </View>
         </View> */}
         <View className="px-5 my-6">
+          <View className="flex-row gap-3 mb-5">
+            {homeActions.map((action) => (
+              <Link href={action.route} key={action.label} asChild>
+                <TouchableOpacity className="flex-1  rounded-2xl overflow-hidden">
+                  <LinearGradient
+                    colors={action.gradient}
+                    className="flex-1 p-[15px] overflow-hidden rounded-2xl"
+                  >
+                    <View className="flex-1 gap-2">
+                      <View className="w-8 h-8 rounded-md bg-[#3da35d]/80 justify-center items-center">
+                        <Ionicons
+                          name={action.icon}
+                          size={16}
+                          color="white"
+                          // color="#3da35d"
+                        />
+                      </View>
+                      <Text className="text-['#1f1f1f'] text-sm font-semibold">
+                        {action.label}
+                      </Text>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </Link>
+            ))}
+          </View>
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-[#1a1a1a] text-xl font-bold">
               Today's Schedule
             </Text>
-            <Link href="/medications/display" asChild>
+            {/* <Link href="/medications/display" asChild>
               <TouchableOpacity>
                 <Text className="text-[#2e7d32] text-base font-semibold">
                   See All Medications
                 </Text>
               </TouchableOpacity>
-            </Link>
+            </Link> */}
           </View>
           <View>
             {todayMedData.length === 0 ? (
               <View className="items-center mt-10">
-                <Ionicons name="medkit-outline" size={48} color="#ccc" />
-                <Text className="text-[#666] text-base mt-2.5 mb-5">
-                  No medications scheduled
-                </Text>
-                <Link className="w-full" href="/medications/add" asChild>
+                <Octicons name="clock" size={46} color="#ccc" />
+                <View className="flex gap-2 mt-5 items-center">
+                  <Text className="text-[#666] text-lg font-medium">
+                    No medications
+                  </Text>
+                  <Text className="text-[#666] text-base">
+                    Add new medications from the '+' icon.
+                  </Text>
+                </View>
+                {/* <Link className="w-full" href="/medications/add" asChild>
                   <TouchableOpacity className="bg-[#1a8e2d] w-[60%] flex items-center justify-center p-4 rounded-md">
                     <Text className="text-white font-semibold">
                       Add Medications
                     </Text>
                   </TouchableOpacity>
-                </Link>
+                </Link> */}
               </View>
             ) : (
               <View className="gap-2">
                 {todayMedData.map((medicine) => (
-                  <View key={medicine.medTime} className="gap-2">
+                  <View key={medicine.time} className="gap-2">
                     <View className="flex-row items-center border-[1px] border-zinc-200 bg-white rounded-2xl p-4 shadow-sm">
                       <View
                         className={`w-[50px] h-[50px] rounded-full justify-center items-center mr-[15px]`}
@@ -317,17 +368,19 @@ export default function HomeScreen() {
                             color="#ccc"
                           />
                           <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
-                            {medicine.medTime}
+                            {medicine.time}
                           </Text>
                         </View>
                       </View>
                       {medicine.taken ? (
                         <TouchableOpacity
                           onPress={() => {
+                            console.log("Take button pressed.");
                             handleMedToggle(
                               medicine.id,
-                              medicine.medTime,
-                              medicine.taken
+                              medicine.time,
+                              medicine.taken,
+                              medicine.date
                             );
                           }}
                           style={{
@@ -347,13 +400,15 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                       ) : (
                         <TouchableOpacity
-                          onPress={() =>
+                          onPress={() => {
+                            console.log("TAKEN button pressed.");
                             handleMedToggle(
                               medicine.id,
-                              medicine.medTime,
-                              medicine.taken
-                            )
-                          }
+                              medicine.time,
+                              medicine.taken,
+                              medicine.date
+                            );
+                          }}
                           className="brand-surface  border-[1.3px] surface-bdr rounded-full flex justify-center items-center"
                           style={{
                             paddingVertical: 8,
@@ -408,7 +463,7 @@ export default function HomeScreen() {
                     // .filter((med) => !med.taken)
                     .map((med) => (
                       <View
-                        key={med.medTime}
+                        key={med.time}
                         className="flex-row items-start justify-start border-[1px] border-zinc-200 bg-white rounded-2xl p-4 mt-3 shadow-sm"
                       >
                         <View
@@ -433,7 +488,7 @@ export default function HomeScreen() {
                               color="#ccc"
                             />
                             <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
-                              {med.medTime}
+                              {med.time}
                             </Text>
                           </View>
                         </View>

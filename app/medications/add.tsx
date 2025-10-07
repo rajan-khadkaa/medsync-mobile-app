@@ -20,6 +20,7 @@ import { brandColors } from "@/constants/Colors";
 import HeaderBar from "@/components/other/HeaderBar";
 import { router, usePathname } from "expo-router";
 import { useFormPageBackHook } from "@/utils/formPageBackHandler";
+import { today } from "@/utils/date";
 
 const AddMedicationScreen = () => {
   const pathname = usePathname();
@@ -38,9 +39,10 @@ const AddMedicationScreen = () => {
     // iconPackage: "Ionicons",
     // duration: null,
     frequency: "Daily",
-    date: new Date(),
-    time: [{ medTime: currentTime, taken: false }],
+    date: today(),
+    // time: [{ medTime: currentTime, taken: false }],
     // time: ["10:00", "11:00"],
+    time: [],
     color: "#26A69A",
     reminder: false,
     refill: false,
