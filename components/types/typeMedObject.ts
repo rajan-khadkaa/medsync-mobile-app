@@ -1,5 +1,5 @@
 import { typeTodayMeds } from "./typeTodayMeds";
 
-export type typeMedHistory = {
+export type typeMedObject = {
   [dateKey: string]: typeTodayMeds[];
 };

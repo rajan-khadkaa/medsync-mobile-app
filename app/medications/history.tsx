@@ -1,23 +1,23 @@
 import { View, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
-import { getMedsHistory } from "@/utils/storage";
+import { getMedHistory } from "@/utils/storage";
 import { Ionicons, Octicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import HeaderBar from "@/components/other/HeaderBar";
 import { displayIcons } from "@/utils/displayIcons";
-import { typeMedHistory } from "@/components/types/typeMedHistory";
+import { typeMedObject } from "@/components/types/typeMedObject";
 
 const MedicationHistoryScreen = () => {
-  const [medData, setMedData] = useState<typeMedHistory>({});
+  const [medData, setMedData] = useState<typeMedObject>({});
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      const medicationData = await getMedsHistory();
+      const medicationData = await getMedHistory();
       setMedData(medicationData);
-      console.log("med history on UI: ", medicationData);
+      // console.log("med history on UI: ", medicationData);
     } catch (error) {
       console.error("Failed to fetch med data:", error);
     }
@@ -88,6 +88,7 @@ const MedicationHistoryScreen = () => {
             ) : (
               Object.entries(medData).map(([medDate, medAray]) => (
                 <View key={medDate}>
+                  <Text>{medDate}</Text>
                   {medAray.map((med) => (
                     <View
                       key={med.time}
@@ -99,29 +100,42 @@ const MedicationHistoryScreen = () => {
                       >
                         {displayIcons(med.iconPackage, med.icon, 20, "#fff")}
                       </View>
-                      <View className="flex-1 gap-2">
-                        <View className="flex-row justify-between items-center">
-                          <Text className="text-[#1a1a1a] text-base font-semibold">
-                            {med.name}
-                          </Text>
-                          {med.strength && med.unit && (
-                            <Text className="text-[#666] text-sm">{`${med.strength}${med.unit}`}</Text>
-                          )}
-                        </View>
-                        <View className="flex-row justify-between">
-                          <View className=" flex-1 flex-wrap flex-row gap-4">
-                            <View className="flex flex-row items-center self-start">
-                              <Ionicons
-                                name="time-outline"
-                                size={16}
-                                color="#ccc"
-                              />
-                              <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
-                                {med.time}
-                              </Text>
-                            </View>
+                      <View className="flex-1 flex-row justify-between items-start gap-2">
+                        <View className="flex-1 gap-2">
+                          <View className="flex-row justify-between items-center">
+                            <Text className="text-[#1a1a1a] text-base font-semibold">
+                              {med.name}
+                            </Text>
+                            {med.strength && med.unit && (
+                              <Text className="text-[#666] text-sm">{`${med.strength}${med.unit}`}</Text>
+                            )}
+                          </View>
+
+                          <View className="flex flex-row items-center self-start">
+                            <Ionicons
+                              name="time-outline"
+                              size={16}
+                              color="#ccc"
+                            />
+                            <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
+                              {med.time}
+                            </Text>
                           </View>
                         </View>
+                        {med.timestamp ? (
+                          <View className="bg-green-100 rounded-full py-1 px-3">
+                            <Text className="text-xs text-green-600">
+                              Taken:
+                              {`${med.timestamp?.split("T")[1].split(":")[0]}:${
+                                med.timestamp?.split("T")[1].split(":")[1]
+                              }`}
+                            </Text>
+                          </View>
+                        ) : (
+                          <View className="bg-red-100 rounded-full py-1 px-3">
+                            <Text className="text-xs text-red-600">Missed</Text>
+                          </View>
+                        )}
                       </View>
                     </View>
                   ))}

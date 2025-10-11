@@ -4,6 +4,7 @@ import { brandColors } from "@/constants/Colors";
 import { actions, dummyData, homeActions } from "@/constants/Values";
 import { displayIcons } from "@/utils/displayIcons";
 import {
+  addMedHistory,
   clearAllData,
   getMedData,
   getTodayMeds,
@@ -67,11 +68,18 @@ function CircularProgress({
     <View className="items-center justify-center my-2.5">
       <View className="absolute z-10 items-center justify-center">
         <Text className="text-white text-[36px] font-bold">
-          {Math.round(progress)}
+          {/* {Math.round(progress)} */}
+          {/* {Math.round(progress * 100)}% */}
+          {completedDoses}/{totalDoses}
         </Text>
-        <Text className="text-white/90 text-sm mt-1">
-          {completedDoses} of {totalDoses} doses.
-        </Text>
+        <View className="text-white/90 justify-center items-center flex-col gap-1 mt-1">
+          {/* {completedDoses} of {totalDoses} doses. */}
+          {/* <Text className="text-white/90 text-sm ">
+            {Math.round(progress * 100)}% of today's
+          </Text>
+          <Text className="text-white/90 text-sm ">medications</Text> */}
+          <Text className="text-white/90 text-sm ">of meds taken</Text>
+        </View>
       </View>
       <Svg
         width={size}
@@ -110,7 +118,9 @@ export default function HomeScreen() {
   const [todayMedData, setTodayMedData] = useState<typeTodayMeds[]>([]);
 
   useEffect(() => {
+    addMedHistory();
     fetchData();
+    console.log("use effect just ran");
   }, []);
 
   const fetchData = async () => {
@@ -118,7 +128,7 @@ export default function HomeScreen() {
       const medicationData = await getTodayMeds();
       setTodayMedData(medicationData);
       console.log(
-        "todays med data from storage on home page: ",
+        "todays med data from storage on home page from getToday (): ",
         medicationData
       );
     } catch (error) {
@@ -126,18 +136,31 @@ export default function HomeScreen() {
     }
   };
 
+  const countTakenDoses = (): number => {
+    if (todayMedData.length === 0) return 0;
+    const countTotalTaken: typeTodayMeds[] = todayMedData.filter(
+      (med) => med.taken
+    );
+    return countTotalTaken.length;
+  };
+
+  const countTotalDoses = (): number => {
+    return todayMedData.length === 0 ? 0 : todayMedData.length;
+  };
+
   //NEED TO REWRITE THIS LOGIC TO TOGGLE MED TAKEN / NOT-TAKEN
   const handleMedToggle = async (
     id: string,
     time: string,
-    taken: boolean,
-    date: Date
+    taken: boolean
+    // date: Date
   ) => {
     // console.log('medication by default is: ', )
     if (taken) {
+      // console.log("taken is true so this untake action will run.");
       Alert.alert(
         "Mark as not taken?",
-        "Did you want to mark this medication as not taken?",
+        "Do you want to mark this medication as not taken?",
         [
           {
             text: "Cancel",
@@ -146,52 +169,21 @@ export default function HomeScreen() {
           {
             text: "Mark as not taken",
             onPress: async () => {
-              const medication = await medTakenToggle(
-                id,
-                date.toDateString(),
-                time
-              );
+              await medTakenToggle(id, time);
+              // await medTakenToggle(id, date, time);
               fetchData();
             },
           },
         ]
       );
     } else {
-      await medTakenToggle(id, date.toDateString(), time);
+      // console.log("taken is false so this TAKE action will run.");
+      await medTakenToggle(id, time);
+      // await medTakenToggle(id, date, time);
       fetchData();
     }
 
-    // if (!medication) return;
-
-    // if (medication.taken) {
-    //   Alert.alert(
-    //     "Mark as untaken?",
-    //     "Did you want this medication as untaken?",
-    //     [
-    //       {
-    //         text: "Cancel",
-    //         style: "cancel",
-    //       },
-    //       {
-    //         text: "Mark Untaken",
-    //         onPress: () => {
-    //           setMedications(
-    //             medications.map((med) =>
-    //               med.id === id ? { ...med, taken: false } : med
-    //             )
-    //           );
-    //           // later add toast here saying that med is marked as not taken
-    //         },
-    //       },
-    //     ]
-    //   );
-    // } else {
-    //   setMedications(
-    //     medications.map((med) =>
-    //       med.id === id ? { ...med, taken: true } : med
-    //     )
-    //   );
-    // }
+    // fetchData();
   };
 
   // const [medications, setMedications] = useState<Medication[]>(dummyData);
@@ -239,9 +231,9 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
             <CircularProgress
-              progress={50}
-              totalDoses={10}
-              completedDoses={5}
+              progress={countTakenDoses() / countTotalDoses()}
+              totalDoses={countTotalDoses()}
+              completedDoses={countTakenDoses()}
             />
           </View>
         </LinearGradient>
@@ -375,12 +367,12 @@ export default function HomeScreen() {
                       {medicine.taken ? (
                         <TouchableOpacity
                           onPress={() => {
-                            console.log("Take button pressed.");
+                            // console.log("Take button pressed.", medicine.taken);
                             handleMedToggle(
                               medicine.id,
                               medicine.time,
-                              medicine.taken,
-                              medicine.date
+                              medicine.taken
+                              // medicine.date
                             );
                           }}
                           style={{
@@ -401,12 +393,16 @@ export default function HomeScreen() {
                       ) : (
                         <TouchableOpacity
                           onPress={() => {
-                            console.log("TAKEN button pressed.");
+                            // console.log(
+                            //   "TAKEN button pressed.",
+                            //   medicine.taken
+                            // );
+
                             handleMedToggle(
                               medicine.id,
                               medicine.time,
-                              medicine.taken,
-                              medicine.date
+                              medicine.taken
+                              // medicine.date
                             );
                           }}
                           className="brand-surface  border-[1.3px] surface-bdr rounded-full flex justify-center items-center"
@@ -419,6 +415,57 @@ export default function HomeScreen() {
                           <Text className="brand-text font-semibold">Take</Text>
                         </TouchableOpacity>
                       )}
+                      {/* {medicine.taken ? (
+                        <TouchableOpacity
+                          onPress={() => {
+                            console.log("Take button pressed.", medicine.taken);
+                            handleMedToggle(
+                              medicine.id,
+                              medicine.time,
+                              medicine.taken
+                              // medicine.date
+                            );
+                          }}
+                          style={{
+                            // borderColor: "#3da35d",
+                            paddingVertical: 8,
+                            paddingHorizontal: 8,
+                            width: 90,
+                          }}
+                          className="flex-row gap-[0.3rem] items-center justify-center brand-surface  border-[1.3px] surface-bdr rounded-full"
+                        >
+                          <Ionicons
+                            name="checkmark-circle-outline"
+                            size={18}
+                            color="#3da35d"
+                          />
+                          <Text className="text-[#3da35d] mr-1">Taken</Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => {
+                            console.log(
+                              "TAKEN button pressed.",
+                              medicine.taken
+                            );
+
+                            handleMedToggle(
+                              medicine.id,
+                              medicine.time,
+                              medicine.taken
+                              // medicine.date
+                            );
+                          }}
+                          className="border-[1.3px] border-zinc-200 rounded-full flex justify-center items-center"
+                          style={{
+                            paddingVertical: 8,
+                            paddingHorizontal: 8,
+                            width: 90,
+                          }}
+                        >
+                          <Text className="brand-text font-semibold">Take</Text>
+                        </TouchableOpacity>
+                      )} */}
                     </View>
                   </View>
                 ))}

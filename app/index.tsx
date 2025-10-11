@@ -2,6 +2,7 @@ import { View, Text, Animated, ImageBackground } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
+import { addMedHistory } from "@/utils/storage";
 
 export default function SplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -9,6 +10,7 @@ export default function SplashScreen() {
   const router = useRouter();
 
   useEffect(() => {
+    addMedHistory();
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
