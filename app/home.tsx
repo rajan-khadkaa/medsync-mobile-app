@@ -1,10 +1,10 @@
 import { typeMedicine } from "@/components/types/typeMedicine";
+import { typeMedObject } from "@/components/types/typeMedObject";
 import { typeTodayMeds } from "@/components/types/typeTodayMeds";
 import { brandColors } from "@/constants/Colors";
 import { actions, dummyData, homeActions } from "@/constants/Values";
 import { displayIcons } from "@/utils/displayIcons";
 import {
-  addMedHistory,
   clearAllData,
   getMedData,
   getTodayMeds,
@@ -115,10 +115,11 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const [notificationModal, setNotificationModal] = useState<boolean>(false);
+  // const [todayMedData, setTodayMedData] = useState<typeTodayMeds[]>([]);
   const [todayMedData, setTodayMedData] = useState<typeTodayMeds[]>([]);
 
   useEffect(() => {
-    addMedHistory();
+    // addMedHistory();
     fetchData();
     console.log("use effect just ran");
   }, []);
@@ -126,7 +127,9 @@ export default function HomeScreen() {
   const fetchData = async () => {
     try {
       const medicationData = await getTodayMeds();
-      setTodayMedData(medicationData);
+      const dateKey = Object.keys(medicationData)[0];
+      const todaysMeds = medicationData[dateKey];
+      setTodayMedData(todaysMeds);
       console.log(
         "todays med data from storage on home page from getToday (): ",
         medicationData

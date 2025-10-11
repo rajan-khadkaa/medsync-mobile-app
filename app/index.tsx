@@ -2,7 +2,8 @@ import { View, Text, Animated, ImageBackground } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
-import { addMedHistory } from "@/utils/storage";
+import { addTodaysMeds, handleDayChange } from "@/utils/storage";
+// import { addMedHistory } from "@/utils/storage";
 
 export default function SplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -10,7 +11,8 @@ export default function SplashScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    addMedHistory();
+    // addMedHistory();
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -24,16 +26,41 @@ export default function SplashScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-
-    const timer = setTimeout(() => {
-      router.replace("/home");
-      // router.replace("/medications/add");
-    }, 500);
+    // const timer = setTimeout(() => {
+    //   router.replace("/home");
+    // }, 500);
     // const timer = setTimeout(() => {
     //   router.replace("/auth");
     // }, 2000);
 
-    return () => clearTimeout(timer);
+    let timer: NodeJS.Timeout;
+
+    const wait = (tm: number): Promise<void> => {
+      //here new promise is created that promises to resolve/fulfill of timer (of number received in argument)
+
+      return new Promise((resolve) => {
+        // here 'timer' can also be done as times = setTimeout(resolve, tm)
+        timer = setTimeout(() => {
+          resolve();
+        }, tm);
+      });
+    };
+
+    const initializeApp = async () => {
+      await addTodaysMeds();
+      await Promise.all([
+        //here Promise.all makes sure that all promise are fulfillled so then only other blocks run
+        handleDayChange(),
+        wait(500), //passing 500 ms for setTimeout function that is inside new Promise above
+      ]);
+      router.replace("/home");
+    };
+
+    initializeApp();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   return (

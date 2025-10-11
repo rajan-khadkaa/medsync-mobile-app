@@ -98,7 +98,31 @@ export const getMedHistory = async (): Promise<typeMedObject> => {
   return history;
 };
 
-export const getMedsOfToday = async (): Promise<typeMedObject> => {
+export const handleDayChange = async () => {
+  try {
+    const todayMeds = await getTodayMeds();
+    if (Object.keys(todayMeds).length === 0) return;
+
+    const storedDate = Object.keys(todayMeds)[0];
+    const now = new Date();
+    const todayDate = now.toDateString();
+
+    if (storedDate === todayDate) return;
+
+    const medHistory = await getMedHistory();
+    if (!medHistory[storedDate]) {
+      medHistory[storedDate] = todayMeds[storedDate];
+      await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(medHistory));
+    }
+
+    //clear today meds (MED_TODAY) from storage once it is added/moved to MED_HISTORY
+    await AsyncStorage.setItem(MED_TODAY, JSON.stringify({}));
+  } catch (error) {
+    console.log("Something went wrong: ", error);
+  }
+};
+
+export const getTodayMeds = async (): Promise<typeMedObject> => {
   try {
     const stored = await AsyncStorage.getItem(MED_TODAY);
 
@@ -162,102 +186,22 @@ export const addTodaysMeds = async () => {
   }
 };
 
-export const addMedHistory = async () => {
-  try {
-    const medicationsData = await getMedData();
-    if (medicationsData.length === 0) return [];
-
-    const checkTodayMedsExists = await getMedHistory();
-    // if (checkTodayMedsExists[today().toDateString()]) {
-    // console.log("This date's med " +(today().toDateString())+ " already exists in history so do nothing");
-    // return;
-
-    const todaysMedArray: typeTodayMeds[] = [];
-
-    for (const medication of medicationsData) {
-      if (shouldAppearToday(medication.date, medication.frequency)) {
-        for (const tm of medication.time) {
-          const timeMappedMed = {
-            id: medication.id,
-            name: medication.name,
-            strength: medication.strength,
-            unit: medication.unit,
-            icon: medication.icon,
-            iconPackage: medication.iconPackage,
-            date: medication.date,
-            time: tm,
-            color: medication.color,
-            taken: false,
-            missed: false,
-          };
-          todaysMedArray.push(timeMappedMed);
-        }
-      }
-    }
-
-    // await saveMedsHistory(todaysMedArray, today().toDateString());
-    const stored = await AsyncStorage.getItem(MED_HISTORY);
-    const history =
-      stored && stored.length !== 0 ? await JSON.parse(stored) : {};
-
-    history[today().toDateString()] = todaysMedArray;
-
-    await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(history));
-  } catch (error) {
-    console.log("Failed to get med data: ", error);
-    return [];
-  }
-};
-
-export const getTodayMeds = async (): Promise<typeTodayMeds[]> => {
-  try {
-    // const stored = await AsyncStorage.getItem(MED_HISTORY);
-    // const history = stored ? await JSON.parse(stored) : {};
-    const history: typeMedObject = await getMedHistory();
-    // console.log(
-    //   "meds history it got from getMedHistory() inside getToday() function: ",
-    //   history
-    // );
-    const checkDate = today().toDateString();
-    const todaysMedsArray: typeTodayMeds[] = history[checkDate];
-    console.log(
-      `all meds in array from getToday() for today i.e. ${today().toDateString()}: `,
-      todaysMedsArray
-    );
-    return todaysMedsArray ? todaysMedsArray : [];
-  } catch (error) {
-    console.log("Could not get todays meds: ", error);
-    return [];
-  }
-};
-
-export const medTakenToggle = async (
-  medId: string,
-  // checkDate: Date,
-  checkTime: string
-) => {
+export const medTakenToggle = async (medId: string, checkTime: string) => {
   // console.log("GOT the function call. PROCEEDING...");
   try {
-    // console.log("type of date received is: ", typeof checkDate);
-    // console.log("date received is: ", checkDate);
-    const dateString = today().toDateString();
-    // const stringDate = checkDate.toDateString();
-    // console.log(
-    //   "type of date after converting to toDateString is: ",
-    //   typeof dateString
-    // );
-    // console.log("date after toDateString is: ", dateString);
-    const stored = await AsyncStorage.getItem(MED_HISTORY);
-    const history = stored ? JSON.parse(stored) : {};
-    // console.log("ALL data before toggling taken value: ", history);
+    const medToToggle: typeMedObject = await getTodayMeds();
+    if (Object.keys(medToToggle).length === 0) return;
 
-    const checkSpecificMed = history[dateString];
+    // const dateString = today().toDateString();
+
+    const pickedMedDate = Object.keys(medToToggle)[0];
+    console.log("med to be toggled is of date: ", pickedMedDate);
+
+    const checkSpecificMed = medToToggle[pickedMedDate];
     console.log(
       "specific med array of specific date to be toggled: ",
       checkSpecificMed
     );
-
-    // const checkSpecificMed:typeTodayMeds[] = await getTodayMeds();
 
     if (!checkSpecificMed || checkSpecificMed.length === 0) return;
 
@@ -267,7 +211,7 @@ export const medTakenToggle = async (
         return {
           ...medication,
           taken: !medication.taken,
-          timestamp: today(),
+          timestamp: today().toISOString(),
         };
       }
       return medication;
@@ -277,14 +221,94 @@ export const medTakenToggle = async (
     //   "toggled med array with edited/updated taken value is: ",
     //   toggledMed
     // );
-    history[dateString] = toggledMed;
+    medToToggle[pickedMedDate] = toggledMed;
 
-    await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(history));
+    await AsyncStorage.setItem(MED_TODAY, JSON.stringify(medToToggle));
   } catch (error) {
     console.log("Could not toggle taken/not-taken: ", error);
+    return;
+  }
+};
+
+export const clearAllData = async (): Promise<boolean> => {
+  try {
+    await AsyncStorage.multiRemove([MED_DATA, MED_HISTORY, MED_TODAY]);
+    return true;
+  } catch (error) {
+    console.log("Failed to delete all data: ", error);
     return false;
   }
 };
+
+// export const addMedHistory = async () => {};
+// export const addMedHistory = async () => {
+//   try {
+//     const medicationsData = await getMedData();
+//     if (medicationsData.length === 0) return [];
+
+//     const checkTodayMedsExists = await getMedHistory();
+//     // if (checkTodayMedsExists[today().toDateString()]) {
+//     // console.log("This date's med " +(today().toDateString())+ " already exists in history so do nothing");
+//     // return;
+
+//     const todaysMedArray: typeTodayMeds[] = [];
+
+//     for (const medication of medicationsData) {
+//       if (shouldAppearToday(medication.date, medication.frequency)) {
+//         for (const tm of medication.time) {
+//           const timeMappedMed = {
+//             id: medication.id,
+//             name: medication.name,
+//             strength: medication.strength,
+//             unit: medication.unit,
+//             icon: medication.icon,
+//             iconPackage: medication.iconPackage,
+//             date: medication.date,
+//             time: tm,
+//             color: medication.color,
+//             taken: false,
+//             missed: false,
+//           };
+//           todaysMedArray.push(timeMappedMed);
+//         }
+//       }
+//     }
+
+//     // await saveMedsHistory(todaysMedArray, today().toDateString());
+//     const stored = await AsyncStorage.getItem(MED_HISTORY);
+//     const history =
+//       stored && stored.length !== 0 ? await JSON.parse(stored) : {};
+
+//     history[today().toDateString()] = todaysMedArray;
+
+//     await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(history));
+//   } catch (error) {
+//     console.log("Failed to get med data: ", error);
+//     return [];
+//   }
+// };
+
+// export const getTodayMeds = async (): Promise<typeTodayMeds[]> => {
+//   try {
+//     // const stored = await AsyncStorage.getItem(MED_HISTORY);
+//     // const history = stored ? await JSON.parse(stored) : {};
+//     const history: typeMedObject = await getMedHistory();
+//     // console.log(
+//     //   "meds history it got from getMedHistory() inside getToday() function: ",
+//     //   history
+//     // );
+//     const checkDate = today().toDateString();
+//     const todaysMedsArray: typeTodayMeds[] = history[checkDate];
+//     console.log(
+//       `all meds in array from getToday() for today i.e. ${today().toDateString()}: `,
+//       todaysMedsArray
+//     );
+//     return todaysMedsArray ? todaysMedsArray : [];
+//   } catch (error) {
+//     console.log("Could not get todays meds: ", error);
+//     return [];
+//   }
+// };
 
 // export const getDoseHistory = async (): Promise<typeDoseHistory[]> => {
 //   try {
@@ -331,13 +355,3 @@ export const medTakenToggle = async (
 //     return false;
 //   }
 // };
-
-export const clearAllData = async (): Promise<boolean> => {
-  try {
-    await AsyncStorage.multiRemove([MED_DATA, MED_HISTORY]);
-    return true;
-  } catch (error) {
-    console.log("Failed to delete all data: ", error);
-    return false;
-  }
-};
