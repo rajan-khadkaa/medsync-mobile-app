@@ -1,115 +1,27 @@
-import { typeMedicine } from "@/components/types/typeMedicine";
-import { typeMedObject } from "@/components/types/typeMedObject";
+import CircularProgressBar from "@/components/other/CircularProgressBar";
 import { typeTodayMeds } from "@/components/types/typeTodayMeds";
 import { brandColors } from "@/constants/Colors";
-import { actions, dummyData, homeActions } from "@/constants/Values";
+import { homeActions } from "@/constants/Values";
 import { displayIcons } from "@/utils/displayIcons";
 import {
   clearAllData,
-  getMedData,
+  deleteSpecficMedHistory,
   getTodayMeds,
   medTakenToggle,
 } from "@/utils/storage";
 import { Ionicons, Octicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  Animated,
-  Dimensions,
   Alert,
   Modal,
   Pressable,
 } from "react-native";
-import Svg, { Circle } from "react-native-svg";
-
-const { width } = Dimensions.get("window");
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
-interface CircularProgressProps {
-  progress: number;
-  totalDoses: number;
-  completedDoses: number;
-}
-
-function CircularProgress({
-  progress,
-  totalDoses,
-  completedDoses,
-}: CircularProgressProps) {
-  const animationValue = useRef(new Animated.Value(0)).current;
-  const size = width * 0.48;
-  // const size = width * 0.55;
-  const strokeWidth = 18;
-  // const strokeWidth = 28;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-
-  useEffect(() => {
-    // clearAllData();
-    Animated.timing(animationValue, {
-      toValue: progress,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, [progress]);
-
-  const strokeDashoffset = animationValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [circumference, 0],
-  });
-
-  return (
-    <View className="items-center justify-center my-2.5">
-      <View className="absolute z-10 items-center justify-center">
-        <Text className="text-white text-[36px] font-bold">
-          {/* {Math.round(progress)} */}
-          {/* {Math.round(progress * 100)}% */}
-          {completedDoses}/{totalDoses}
-        </Text>
-        <View className="text-white/90 justify-center items-center flex-col gap-1 mt-1">
-          {/* {completedDoses} of {totalDoses} doses. */}
-          {/* <Text className="text-white/90 text-sm ">
-            {Math.round(progress * 100)}% of today's
-          </Text>
-          <Text className="text-white/90 text-sm ">medications</Text> */}
-          <Text className="text-white/90 text-sm ">of meds taken</Text>
-        </View>
-      </View>
-      <Svg
-        width={size}
-        height={size}
-        style={{ transform: [{ rotate: "-90deg" }] }}
-      >
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
-        <AnimatedCircle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke="white"
-          strokeWidth={strokeWidth}
-          fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        />
-      </Svg>
-    </View>
-  );
-}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -121,12 +33,22 @@ export default function HomeScreen() {
   useEffect(() => {
     // addMedHistory();
     fetchData();
+    // handleDayChange();
+    // deleteSpecficMedHistory("Sun Oct 12 2025");
     console.log("use effect just ran");
   }, []);
 
   const fetchData = async () => {
     try {
       const medicationData = await getTodayMeds();
+
+      // Check if medicationData is empty or has no keys
+      if (!medicationData || Object.keys(medicationData).length === 0) {
+        setTodayMedData([]);
+        console.log("No medication data found");
+        return;
+      }
+
       const dateKey = Object.keys(medicationData)[0];
       const todaysMeds = medicationData[dateKey];
       setTodayMedData(todaysMeds);
@@ -151,7 +73,6 @@ export default function HomeScreen() {
     return todayMedData.length === 0 ? 0 : todayMedData.length;
   };
 
-  //NEED TO REWRITE THIS LOGIC TO TOGGLE MED TAKEN / NOT-TAKEN
   const handleMedToggle = async (
     id: string,
     time: string,
@@ -189,8 +110,6 @@ export default function HomeScreen() {
     // fetchData();
   };
 
-  // const [medications, setMedications] = useState<Medication[]>(dummyData);
-
   return (
     <View className="h-screen relative bg-[#fff]">
       <TouchableOpacity
@@ -204,7 +123,9 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <LinearGradient
-          className="pt-[45px] pb-[25px] rounded-b-[3rem] overflow-hidden"
+          className="pt-[45px] pb-[25px] overflow-hidden"
+          // className="pt-[45px] pb-[25px] rounded-b-[3rem] overflow-hidden"
+          // colors={["#eee", "#eee"]}
           colors={["#3da35d", "#3da35d"]}
           // colors={["#3fa34d", "#3fa34d"]}
         >
@@ -233,7 +154,7 @@ export default function HomeScreen() {
                 </View>
               </TouchableOpacity>
             </View>
-            <CircularProgress
+            <CircularProgressBar
               progress={countTakenDoses() / countTotalDoses()}
               totalDoses={countTotalDoses()}
               completedDoses={countTakenDoses()}

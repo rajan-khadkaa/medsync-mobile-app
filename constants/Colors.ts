@@ -28,7 +28,10 @@ export const Colors = {
 export const brandColors = {
   primary: "#3da35d",
   primaryBg: "#d4f1de",
-  seconaryBg: "#5bc27b",
+  primaryDrk: "#67c283",
+  // primaryDrk: "#76c28e",
+  // primaryDrk: "#8cc29d",
+  secondaryBg: "#5bc27b",
   grey: "#aaa",
   black: "#111",
   surfaceBlack: "#555",

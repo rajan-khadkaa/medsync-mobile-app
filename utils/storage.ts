@@ -98,27 +98,115 @@ export const getMedHistory = async (): Promise<typeMedObject> => {
   return history;
 };
 
-export const handleDayChange = async () => {
-  try {
-    const todayMeds = await getTodayMeds();
-    if (Object.keys(todayMeds).length === 0) return;
+// export const handleDayChange = async () => {
+//   try {
+//     const todayMeds = await getTodayMeds();
+//     if (Object.keys(todayMeds).length === 0) return;
 
-    const storedDate = Object.keys(todayMeds)[0];
-    const now = new Date();
-    const todayDate = now.toDateString();
+//     const storedDate = Object.keys(todayMeds)[0];
+//     const now = new Date();
+//     const todayDate = now.toDateString();
+//     if (storedDate === todayDate) return;
 
-    if (storedDate === todayDate) return;
+//     // const now = new Date();
+//     // const todayDate = now.toDateString();
+//     // if (storedDate !== todayDate)
+//     //   console.log("date of todays med (storage) =/= todays(new Date()) date so add yesterday data to history");
+//     // if (storedDate !== todayDate) return;
 
-    const medHistory = await getMedHistory();
-    if (!medHistory[storedDate]) {
-      medHistory[storedDate] = todayMeds[storedDate];
-      await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(medHistory));
+//     // console.log("date of todays med (storage) = todays(new Date()) date ");
+//     // const medHistory = await getMedHistory();
+//     // console.log(
+//     //   "med data it is getting from med history in handleDayChange(): ",
+//     //   medHistory
+//     // );
+
+//     const medHistory = await getMedHistory();
+//     if (!medHistory[storedDate]) {
+//       medHistory[storedDate] = todayMeds[storedDate];
+//       console.log(
+//         "med data it is saving to med history after adding yesterdays med from handleDayChange(): ",
+//         // medHistory
+//         JSON.stringify(medHistory)
+//       );
+
+//       await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(medHistory));
+//     }
+
+//     //clear today meds (MED_TODAY) from storage once it is added/moved to MED_HISTORY
+//     // await AsyncStorage.setItem(MED_TODAY, JSON.stringify({}));
+//   } catch (error) {
+//     console.log("Something went wrong: ", error);
+//   }
+// };
+export const handleMissedDays = async (
+  lastActive: string,
+  todayDate: string
+) => {
+  const medHistory = await getMedHistory(); // Get all stored past meds
+  const allMeds = await getMedData(); // Get the master list (the medicines user takes)
+  const todayMeds = await getTodayMeds(); // Get today’s meds (from MED_TODAY)
+
+  const last = new Date(lastActive);
+  const today = new Date(todayDate);
+
+  // 1️⃣ Move lastActive day’s meds to history
+  if (todayMeds[lastActive]) {
+    medHistory[lastActive] = todayMeds[lastActive];
+  }
+
+  // 2️⃣ Create missed-day meds for each skipped day (excluding today)
+  let current = new Date(last);
+  current.setDate(current.getDate() + 1); // Move to the *next* day after last active
+
+  while (current < today) {
+    const key = current.toDateString();
+    const missedMeds: typeTodayMeds[] = [];
+
+    // Loop through all master meds
+    for (const med of allMeds) {
+      if (shouldAppearToday(med.date, med.frequency)) {
+        for (const t of med.time) {
+          missedMeds.push({
+            ...med,
+            time: t,
+            taken: false,
+            missed: true,
+          });
+        }
+      }
     }
 
-    //clear today meds (MED_TODAY) from storage once it is added/moved to MED_HISTORY
-    await AsyncStorage.setItem(MED_TODAY, JSON.stringify({}));
+    // Add those missed meds to MED_HISTORY
+    medHistory[key] = missedMeds;
+
+    // Go to next day
+    current.setDate(current.getDate() + 1);
+  }
+
+  // 3️⃣ Save updates to AsyncStorage
+  await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(medHistory));
+
+  // 4️⃣ Reset MED_TODAY for fresh meds today
+  await AsyncStorage.setItem(MED_TODAY, JSON.stringify({}));
+};
+
+export const deleteSpecficMedHistory = async (dateKey: string) => {
+  try {
+    const allMedsHistory: typeMedObject = await getMedHistory();
+
+    console.log("data KEY that will be deleted", dateKey); // Just log the variable
+    console.log("data VALUE that will be deleted", allMedsHistory[dateKey]);
+
+    // FIX: Use bracket notation with the variable
+    delete allMedsHistory[dateKey];
+
+    console.log("med history after deleting oct 12 data", allMedsHistory);
+
+    await AsyncStorage.setItem(MED_HISTORY, JSON.stringify(allMedsHistory));
+    console.log("med data deleted successfully");
   } catch (error) {
-    console.log("Something went wrong: ", error);
+    console.log("Error deleting todays med: ", error);
   }
 };
 
@@ -130,7 +218,7 @@ export const getTodayMeds = async (): Promise<typeMedObject> => {
     if (!stored) return {};
 
     const todaysMed: typeMedObject = JSON.parse(stored);
-    console.log("Today's meds from storage:", todaysMed);
+    // console.log("Today's meds from storage:", todaysMed);
 
     return todaysMed;
   } catch (error) {
@@ -174,10 +262,10 @@ export const addTodaysMeds = async () => {
       [today().toDateString()]: todaysMedArray,
     };
 
-    console.log(
-      "Today's med object to be saved in async storage: ",
-      todaysDataObj
-    );
+    // console.log(
+    //   "Today's med object to be saved in async storage: ",
+    //   todaysDataObj
+    // );
 
     await AsyncStorage.setItem(MED_TODAY, JSON.stringify(todaysDataObj));
   } catch (error) {
