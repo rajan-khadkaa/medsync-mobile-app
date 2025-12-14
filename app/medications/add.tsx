@@ -9,13 +9,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import MedInfo from "@/components/pages/MedInfo";
-import MedType from "@/components/pages/MedType";
-import MedSchedule from "@/components/pages/MedSchedule";
+import MedInfo from "@/components/forms/MedInfo";
+import MedType from "@/components/forms/MedType";
+import MedSchedule from "@/components/forms/MedSchedule";
 // import MedNotify from "@/components/pages/MedNotify";
-import MedNotify from "@/components/pages/MedNotify";
-import { typeMedicine } from "@/components/types/typeMedicine";
-import MedFinal from "@/components/pages/MedFinal";
+import MedNotify from "@/components/forms/MedNotify";
+import { typeMedicine } from "@/components/types/allTypes";
+import MedFinal from "@/components/forms/MedFinal";
 import { brandColors } from "@/constants/Colors";
 import HeaderBar from "@/components/other/HeaderBar";
 import { router, usePathname } from "expo-router";
@@ -39,7 +39,7 @@ const AddMedicationScreen = () => {
     // iconPackage: "Ionicons",
     // duration: null,
     frequency: "Daily",
-    date: today(),
+    date: new Date(),
     // time: [{ medTime: currentTime, taken: false }],
     // time: ["10:00", "11:00"],
     time: [],

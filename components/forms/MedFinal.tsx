@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { medColor, medTypes } from "@/constants/Values";
-import { typeMedicine } from "../types/typeMedicine";
+import { typeMedicine } from "../types/allTypes";
 import PrimaryBtn from "../other/PrimaryBtn";
 import {
   FontAwesome5,
@@ -23,7 +23,7 @@ import {
 import { brandColors } from "@/constants/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { addMedData } from "@/utils/storage";
+import { addMedData, addTodaysMeds } from "@/utils/storage";
 import Toast from "react-native-toast-message";
 import { scheduleMedicationReminder } from "@/utils/notification";
 import { displayIcons } from "@/utils/displayIcons";
@@ -58,39 +58,6 @@ const MedFinal = ({
   type MCIIcons = "liquid-spot" | "dots-horizontal";
   type FontistoIcons = "injection-syringe";
 
-  // const displayIcons = (
-  //   iconPackage: string | undefined,
-  //   icon: string | undefined
-  // ) => {
-  //   const iconSize = 44;
-  //   const iconColor = brandColors.white;
-  //   switch (iconPackage) {
-  //     case "FontAwesome6":
-  //       return <FontAwesome6 name={icon} size={iconSize} color={iconColor} />;
-  //     case "MaterialCommunityIcons":
-  //       return (
-  //         <MaterialCommunityIcons
-  //           name={icon as MCIIcons}
-  //           size={iconSize}
-  //           color={iconColor}
-  //         />
-  //       );
-  //     case "Fontisto":
-  //       return (
-  //         <Fontisto
-  //           name={icon as FontistoIcons}
-  //           size={iconSize}
-  //           color={iconColor}
-  //         />
-  //       );
-  //     // return <Fontisto name={icon} size={iconSize} color={iconColor}/>;
-  //     case "FontAwesome5":
-  //       return <FontAwesome5 name={icon} size={iconSize} color={iconColor} />;
-  //     default:
-  //       return <Ionicons name="medical" size={iconSize} color={iconColor} />;
-  //   }
-  // };
-
   const validateForm = () => {
     return (
       // medDuration.duration !== null &&
@@ -107,6 +74,8 @@ const MedFinal = ({
 
       const checkAdded = await addMedData(medFinal); //without the await it will always be true as even an empty
       // promise is truthy i.e. Promise<void> is truth as well so it will alwyas navigate to home page regardless of returned value
+
+      await addTodaysMeds();
 
       if (medFinal.reminder) {
         await scheduleMedicationReminder(medFinal);

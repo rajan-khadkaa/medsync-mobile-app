@@ -14,7 +14,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { medTypes } from "@/constants/Values";
-import { typeMedicine } from "../types/typeMedicine";
+import { typeMedicine } from "../types/allTypes";
 import PrimaryBtn from "../other/PrimaryBtn";
 
 type typeMedicineProp = {

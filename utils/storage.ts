@@ -1,12 +1,13 @@
-import { typeDoseHistory } from "@/components/types/typeDoseHistory";
-import { typeMedicine } from "@/components/types/typeMedicine";
-import { typeTodayMeds } from "@/components/types/typeTodayMeds";
+import {
+  typeDoseHistory,
+  typeMedicine,
+  typeTodayMeds,
+  typeMedObject,
+} from "@/components/types/allTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useState } from "react";
-import { Alert } from "react-native";
-import { shouldAppearToday } from "././shouldAppearToday";
+import { shouldAppearOnDate } from "./shouldAppearOnDate";
+import { cancelMedicationReminder } from "./notification";
 import { today } from "./date";
-import { typeMedObject } from "@/components/types/typeMedObject";
 
 // const [medData, setMedData] = useState({});
 
@@ -14,6 +15,7 @@ const MED_DATA = "@medicationData";
 // const DOSE_HISTORY = "@doseHistory";
 const MED_HISTORY = "@medicationHistory";
 const MED_TODAY = "@medicationToday";
+const LAST_ACTIVE = "@lastActive";
 
 export const addMedData = async (medData: typeMedicine): Promise<boolean> => {
   try {
@@ -28,6 +30,7 @@ export const addMedData = async (medData: typeMedicine): Promise<boolean> => {
     const medWithId = {
       ...medData,
       id: medId,
+      date: medData.date.toISOString(),
     };
 
     // console.log("med data to be added: ", medWithId);
@@ -65,6 +68,94 @@ export const getMedData = async (): Promise<typeMedicine[]> => {
   }
 };
 
+///TESTTTTTT
+
+// Type examples (for understanding)
+type typeMarkObj = { marked: boolean; dotColor: string };
+type typeMarkData = Record<string, typeMarkObj>;
+
+export const getMarks = async (
+  year: number,
+  month: number
+): Promise<typeMarkData> => {
+  // 1. Get all medication data from AsyncStorage
+  const allMeds = await getMedData();
+  if (!allMeds || allMeds.length === 0) return {};
+
+  // 2. Prepare variables
+  const markData: typeMarkData = {};
+  const today = new Date(); // current date (to compare for gray/green)
+  const totalDays = new Date(year, month, 0).getDate(); // e.g. 31 days for Oct
+
+  // 3. Loop through every day in the selected month
+  for (let day = 1; day <= totalDays; day++) {
+    const formattedMonth = month.toString().padStart(2, "0");
+    const formattedDay = day.toString().padStart(2, "0");
+    const dateStr = `${year}-${formattedMonth}-${formattedDay}`;
+    const currentDate = new Date(dateStr);
+
+    // 4. Check if *any* medication applies to this date
+    const hasMedOnThisDay = allMeds.some((med) =>
+      shouldAppearOnDate(new Date(med.date), med.frequency, dateStr)
+    );
+
+    if (hasMedOnThisDay) {
+      // 5. Choose color depending on past or future
+      const isPast = currentDate < today;
+      // const color = isPast ? "#d4d4d4" : "#1dc251";
+      const color = isPast ? "#fff" : "#1dc251";
+
+      markData[dateStr] = { marked: true, dotColor: color };
+    }
+  }
+
+  return markData;
+};
+
+export const getEachDayMeds = async (
+  dateArg: string
+): Promise<typeTodayMeds[]> => {
+  try {
+    const todayFormattedDate = today().split("T")[0];
+
+    if (todayFormattedDate === dateArg) {
+      const todaysMedsinObj = await getTodayMeds();
+      return todaysMedsinObj[dateArg] || [];
+    } else {
+      const allHistoryMeds = await getMedHistory();
+      return allHistoryMeds[dateArg] || [];
+    }
+
+    // const allMeds = await getMedData();
+    // if (!allMeds || allMeds.length < 1) return [];
+    // let todaysMedArray: typeTodayMeds[] = [];
+    // for (const medication of allMeds) {
+    //   if (shouldAppearOnDate(medication.date, medication.frequency, dateArg)) {
+    //     for (const tm of medication.time) {
+    //       const timeMappedMed = {
+    //         id: medication.id,
+    //         name: medication.name,
+    //         strength: medication.strength,
+    //         unit: medication.unit,
+    //         icon: medication.icon,
+    //         iconPackage: medication.iconPackage,
+    //         date: medication.date,
+    //         time: tm,
+    //         color: medication.color,
+    //         taken: false,
+    //         missed: false,
+    //       };
+    //       todaysMedArray.push(timeMappedMed);
+    //     }
+    //   }
+    // }
+    // return todaysMedArray || [];
+  } catch (error) {
+    console.log("Error geting specific date med");
+    return [];
+  }
+};
+
 export const getSingleMed = async (medId: string) => {
   try {
     const allMeds = await getMedData();
@@ -80,6 +171,8 @@ export const getSingleMed = async (medId: string) => {
 export const deleteMedData = async (medId: string): Promise<boolean> => {
   try {
     const allMeds = await getMedData();
+    const deleteSchedule = await cancelMedicationReminder(medId);
+    if (!deleteMedData) return false;
     const filteredMed = allMeds.filter((med) => med.id !== medId);
     // console.log("med data list after deletion: ", filteredMed);
     await AsyncStorage.setItem(MED_DATA, JSON.stringify(filteredMed));
@@ -147,8 +240,8 @@ export const handleMissedDays = async (
   const allMeds = await getMedData(); // Get the master list (the medicines user takes)
   const todayMeds = await getTodayMeds(); // Get today’s meds (from MED_TODAY)
 
-  const last = new Date(lastActive);
-  const today = new Date(todayDate);
+  const dateLast = new Date(lastActive);
+  const dateToday = new Date(todayDate);
 
   // 1️⃣ Move lastActive day’s meds to history
   if (todayMeds[lastActive]) {
@@ -156,16 +249,16 @@ export const handleMissedDays = async (
   }
 
   // 2️⃣ Create missed-day meds for each skipped day (excluding today)
-  let current = new Date(last);
+  let current = dateLast;
   current.setDate(current.getDate() + 1); // Move to the *next* day after last active
 
-  while (current < today) {
-    const key = current.toDateString();
+  while (current < dateToday) {
+    const key = current.toISOString().split("T")[0];
     const missedMeds: typeTodayMeds[] = [];
 
     // Loop through all master meds
     for (const med of allMeds) {
-      if (shouldAppearToday(med.date, med.frequency)) {
+      if (shouldAppearOnDate(med.date, med.frequency, today())) {
         for (const t of med.time) {
           missedMeds.push({
             ...med,
@@ -238,7 +331,7 @@ export const addTodaysMeds = async () => {
     const todaysMedArray: typeTodayMeds[] = [];
 
     for (const medication of medicationsData) {
-      if (shouldAppearToday(medication.date, medication.frequency)) {
+      if (shouldAppearOnDate(medication.date, medication.frequency, today())) {
         for (const tm of medication.time) {
           const timeMappedMed = {
             id: medication.id,
@@ -259,7 +352,7 @@ export const addTodaysMeds = async () => {
     }
 
     const todaysDataObj = {
-      [today().toDateString()]: todaysMedArray,
+      [today()]: todaysMedArray,
     };
 
     // console.log(
@@ -299,7 +392,7 @@ export const medTakenToggle = async (medId: string, checkTime: string) => {
         return {
           ...medication,
           taken: !medication.taken,
-          timestamp: today().toISOString(),
+          timestamp: today(),
         };
       }
       return medication;
@@ -318,9 +411,31 @@ export const medTakenToggle = async (medId: string, checkTime: string) => {
   }
 };
 
+export const setLastActiveDay = async (dateStr: string) => {
+  try {
+    await AsyncStorage.setItem(LAST_ACTIVE, dateStr);
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+};
+export const getLastActiveDay = async (): Promise<string> => {
+  try {
+    const lastDate = await AsyncStorage.getItem(LAST_ACTIVE);
+    return lastDate || "";
+  } catch (error) {
+    console.log("Error: ", error);
+    return "";
+  }
+};
+
 export const clearAllData = async (): Promise<boolean> => {
   try {
-    await AsyncStorage.multiRemove([MED_DATA, MED_HISTORY, MED_TODAY]);
+    await AsyncStorage.multiRemove([
+      MED_DATA,
+      MED_HISTORY,
+      MED_TODAY,
+      LAST_ACTIVE,
+    ]);
     return true;
   } catch (error) {
     console.log("Failed to delete all data: ", error);

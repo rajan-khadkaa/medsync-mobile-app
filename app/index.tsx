@@ -2,10 +2,15 @@ import { View, Text, Animated, ImageBackground } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { useRouter } from "expo-router";
-import { addTodaysMeds, handleMissedDays } from "@/utils/storage";
-// import { addTodaysMeds, handleDayChange } from "@/utils/storage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { addMedHistory } from "@/utils/storage";
+import {
+  addTodaysMeds,
+  clearAllData,
+  getLastActiveDay,
+  handleMissedDays,
+  setLastActiveDay,
+} from "@/utils/storage";
+
+import { today } from "@/utils/date";
 
 export default function SplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -14,7 +19,8 @@ export default function SplashScreen() {
 
   useEffect(() => {
     const startApp = async () => {
-      // 1️⃣ Animate splash screen (no change)
+      await clearAllData();
+      // 1. Animate splash screen (no change)
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -29,29 +35,32 @@ export default function SplashScreen() {
         }),
       ]).start();
 
-      // 2️⃣ Get today's date
-      const todayDate = new Date().toDateString();
+      // 2. Get today's date
+      const todayDate = today().split("T")[0];
 
-      // 3️⃣ Check if last active date exists
-      const lastActive = await AsyncStorage.getItem("LAST_ACTIVE_DATE");
-
+      // 3. Check if last active date exists
+      const lastActive = await getLastActiveDay();
       if (lastActive && lastActive !== todayDate) {
         // user skipped at least one day
 
         console.log(`Last active: ${lastActive}, today: ${todayDate}`);
 
-        // 4️⃣ Fill missed days + move last day’s meds to MED_HISTORY
+        // 4. Fill missed days + move last day’s meds to MED_HISTORY
         await handleMissedDays(lastActive, todayDate);
+        console.log("missed meds handled");
       }
 
-      // 5️⃣ Always generate today's meds fresh
+      // 5. Always generate today's meds fresh
       await addTodaysMeds();
+      console.log("todays meds added");
 
-      // 6️⃣ Update last active date
-      await AsyncStorage.setItem("LAST_ACTIVE_DATE", todayDate);
+      // 6. Update last active date
+      await setLastActiveDay(todayDate);
+      console.log("last active day updated");
 
-      // 7️⃣ Navigate to Home
+      // 7. Navigate to Home
       router.replace("/home");
+      console.log("navigated to home");
     };
 
     startApp();

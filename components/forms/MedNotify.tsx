@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { medColor, medTypes } from "@/constants/Values";
-import { typeMedicine } from "../types/typeMedicine";
+import { typeMedicine } from "../types/allTypes";
 import PrimaryBtn from "../other/PrimaryBtn";
 import {
   FontAwesome5,

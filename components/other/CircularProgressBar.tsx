@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { View, Text, Animated, Dimensions } from "react-native";
 import Svg, { Circle } from "react-native-svg";
-import { typeCircularProgressBar } from "../types/typeCircularProgressBar";
+import { typeCircularProgressBar } from "../types/allTypes";
 import { brandColors } from "@/constants/Colors";
 
 const { width } = Dimensions.get("window");
@@ -19,7 +19,7 @@ function CircularProgressBar({
   completedDoses,
 }: typeCircularProgressBar) {
   const animationValue = useRef(new Animated.Value(0)).current;
-  const size = width * 0.42;
+  const size = width * 0.38;
   // const size = width * 0.55;
   const strokeWidth = 5;
   // const strokeWidth = 28;
@@ -43,19 +43,20 @@ function CircularProgressBar({
   return (
     <View className="items-center justify-center my-2.5">
       <View className="absolute z-10 items-center justify-center">
-        <Text className="text-white text-[36px] font-bold">
-          {/* {Math.round(progress)} */}
-          {/* {Math.round(progress * 100)}% */}
-          {completedDoses}/{totalDoses}
+        <Text className="text-white text-4xl font-bold">
+          {/* here if taken and total are 0 then it gives NaN so handling with conditional case. {completedDoses}/{totalDoses} *100% */}
+          {/* 100% */}
+          {totalDoses === 0 ? "0%" : `${Math.round(progress * 100)}%`}
         </Text>
-        <View className="text-white/90 justify-center items-center flex-col gap-1 mt-1">
-          {/* {completedDoses} of {totalDoses} doses. */}
-          {/* <Text className="text-white/90 text-sm ">
+        <Text className="text-white/90 text-sm">meds taken</Text>
+        {/* <View className="text-white/90 justify-center items-center flex-col gap-1 mt-1">
+          {completedDoses} of {totalDoses} doses.
+          <Text className="text-white/90 text-sm ">
             {Math.round(progress * 100)}% of today's
           </Text>
-          <Text className="text-white/90 text-sm ">medications</Text> */}
+          <Text className="text-white/90 text-sm ">medications</Text>
           <Text className="text-white/90 text-sm ">of meds taken</Text>
-        </View>
+        </View> */}
       </View>
       <Svg
         //here i added +2 because the circle was getting cropped from all 4 directions
@@ -67,7 +68,7 @@ function CircularProgressBar({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={brandColors.white}
+          stroke={brandColors.primaryDrk}
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -75,7 +76,7 @@ function CircularProgressBar({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={brandColors.primaryDrk}
+          stroke={brandColors.white}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}

@@ -13,7 +13,7 @@ import { Link } from "expo-router";
 import { dummyData } from "@/constants/Values";
 import HeaderBar from "@/components/other/HeaderBar";
 import { brandColors } from "@/constants/Colors";
-import { typeMedicine } from "@/components/types/typeMedicine";
+import { typeMedicine } from "@/components/types/allTypes";
 import Toast from "react-native-toast-message";
 import { displayIcons } from "@/utils/displayIcons";
 
@@ -261,7 +261,7 @@ const DisplayMedicationScreen = () => {
                         ))}
                       </View>
                       <View className="flex-row gap-4">
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                           onPress={() => handleEditMed(med.id)}
                           style={
                             {
@@ -272,15 +272,15 @@ const DisplayMedicationScreen = () => {
                           // className="flex-row gap-[0.5rem] items-center"
                           // className="flex-row gap-[0.5rem] items-center brand-surface rounded-lg"
                         >
-                          {/* <Ionicons
+                          <Ionicons
                             name="create-outline"
                             size={18}
                             color={brandColors.primary}
-                          /> */}
+                          />
                           <Text className="text-zinc-700 text-sm font-medium">
                             Edit
                           </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity
                           onPress={() => handleDeleteMed(med.id)}
                           style={

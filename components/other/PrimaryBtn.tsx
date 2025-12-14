@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import { typeButton } from "../types/typeButton";
+import { typeButton } from "../types/allTypes";
 
 const PrimaryBtn = ({ text, loading, handlePressAction }: typeButton) => {
   return (

@@ -1,6 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import { typeMedicine } from "@/components/types/typeMedicine";
+import { typeMedicine } from "@/components/types/allTypes";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

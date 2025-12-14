@@ -1,5 +1,5 @@
 import CircularProgressBar from "@/components/other/CircularProgressBar";
-import { typeTodayMeds } from "@/components/types/typeTodayMeds";
+import { typeTodayMeds } from "@/components/types/allTypes";
 import { brandColors } from "@/constants/Colors";
 import { homeActions } from "@/constants/Values";
 import { displayIcons } from "@/utils/displayIcons";
@@ -123,7 +123,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <LinearGradient
-          className="pt-[45px] pb-[25px] overflow-hidden"
+          className="pt-10 pb-6 overflow-hidden"
           // className="pt-[45px] pb-[25px] rounded-b-[3rem] overflow-hidden"
           // colors={["#eee", "#eee"]}
           colors={["#3da35d", "#3da35d"]}
@@ -132,7 +132,7 @@ export default function HomeScreen() {
           <View className="items-center px-5 py-1">
             <View className="flex-row items-center justify-center w-full mb-4">
               <View className="flex-1">
-                <Text className="font-semibold text-white text-2xl">
+                <Text className="font-semibold text-white text-xl">
                   Daily progress
                 </Text>
               </View>
@@ -154,11 +154,31 @@ export default function HomeScreen() {
                 </View>
               </TouchableOpacity>
             </View>
-            <CircularProgressBar
-              progress={countTakenDoses() / countTotalDoses()}
-              totalDoses={countTotalDoses()}
-              completedDoses={countTakenDoses()}
-            />
+            <View className="w-full flex-row justify-between px-2 items-center">
+              <View className="flex-col items-center">
+                <Text className="text-3xl font-bold text-white">
+                  {countTakenDoses()}
+                </Text>
+                <Text className="text-white text-sm">
+                  {countTakenDoses() > 1 ? "doses" : "dose"} taken
+                </Text>
+              </View>
+
+              <CircularProgressBar
+                progress={countTakenDoses() / countTotalDoses()}
+                totalDoses={countTotalDoses()}
+                completedDoses={countTakenDoses()}
+              />
+              <View className="flex-col items-center">
+                <Text className="text-3xl font-bold text-white">{`${
+                  countTotalDoses() - countTakenDoses()
+                }`}</Text>
+                <Text className="text-white text-sm">
+                  {countTotalDoses() - countTakenDoses() > 1 ? "doses" : "dose"}{" "}
+                  left
+                </Text>
+              </View>
+            </View>
           </View>
         </LinearGradient>
         {/* <View className="flex-1 pt-5">
@@ -194,152 +214,159 @@ export default function HomeScreen() {
             </View>
           </View>
         </View> */}
-        <View className="px-5 my-6">
-          <View className="flex-row gap-3 mb-5">
-            {homeActions.map((action) => (
-              <Link href={action.route} key={action.label} asChild>
-                <TouchableOpacity className="flex-1  rounded-2xl overflow-hidden">
-                  <LinearGradient
-                    colors={action.gradient}
-                    className="flex-1 p-[15px] overflow-hidden rounded-2xl"
-                  >
-                    <View className="flex-1 gap-2">
-                      <View className="w-8 h-8 rounded-md bg-[#3da35d]/80 justify-center items-center">
-                        <Ionicons
-                          name={action.icon}
-                          size={16}
-                          color="white"
-                          // color="#3da35d"
-                        />
-                      </View>
-                      <Text className="text-['#1f1f1f'] text-sm font-semibold">
-                        {action.label}
-                      </Text>
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </Link>
-            ))}
-          </View>
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-[#1a1a1a] text-xl font-bold">
-              Today's Schedule
+        <View className="px-5 my-5 flex-col gap-6">
+          <View className="w-full flex-col gap-4">
+            <Text className="text-gray-800 text-xl font-bold">
+              Quick Actions
             </Text>
-            {/* <Link href="/medications/display" asChild>
+            <View className="flex-row justify-between w-full">
+              {homeActions.map((action) => (
+                <Link
+                  className="flex-col gap-2 items-center"
+                  href={action.route}
+                  key={action.label}
+                  asChild
+                >
+                  <TouchableOpacity className="flex-col items-center gap-3">
+                    <View className="p-5 brand-surface rounded-full">
+                      <Ionicons
+                        name={action.icon}
+                        size={26}
+                        color={brandColors.primary}
+                      />
+                    </View>
+
+                    <Text className="text-gray-500 text-sm font-semibold">
+                      {action.label}
+                    </Text>
+                  </TouchableOpacity>
+                </Link>
+              ))}
+            </View>
+          </View>
+          <View className="w-full h-[0.12rem] bg-gray-100" />
+          <View>
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-gray-800 text-xl font-bold">
+                Today's Schedule
+              </Text>
+              {/* <Link href="/medications/display" asChild>
               <TouchableOpacity>
                 <Text className="text-[#2e7d32] text-base font-semibold">
                   See All Medications
                 </Text>
               </TouchableOpacity>
             </Link> */}
-          </View>
-          <View>
-            {todayMedData.length === 0 ? (
-              <View className="items-center mt-10">
-                <Octicons name="clock" size={46} color="#ccc" />
-                <View className="flex gap-2 mt-5 items-center">
-                  <Text className="text-[#666] text-lg font-medium">
-                    No medications
-                  </Text>
-                  <Text className="text-[#666] text-base">
-                    Add new medications from the '+' icon.
-                  </Text>
-                </View>
-                {/* <Link className="w-full" href="/medications/add" asChild>
+            </View>
+            <View>
+              {todayMedData.length === 0 ? (
+                <View className="items-center mt-10">
+                  <Octicons name="clock" size={46} color="#ccc" />
+                  <View className="flex gap-2 mt-5 items-center">
+                    <Text className="text-gray-600 text-lg font-medium">
+                      No medications
+                    </Text>
+                    <Text className="text-gray-500 text-base">
+                      Add new medications from the '+' icon.
+                    </Text>
+                  </View>
+                  {/* <Link className="w-full" href="/medications/add" asChild>
                   <TouchableOpacity className="bg-[#1a8e2d] w-[60%] flex items-center justify-center p-4 rounded-md">
                     <Text className="text-white font-semibold">
                       Add Medications
                     </Text>
                   </TouchableOpacity>
                 </Link> */}
-              </View>
-            ) : (
-              <View className="gap-2">
-                {todayMedData.map((medicine) => (
-                  <View key={medicine.time} className="gap-2">
-                    <View className="flex-row items-center border-[1px] border-zinc-200 bg-white rounded-2xl p-4 shadow-sm">
-                      <View
-                        className={`w-[50px] h-[50px] rounded-full justify-center items-center mr-[15px]`}
-                        style={{ backgroundColor: medicine.color }}
-                      >
-                        {displayIcons(
-                          medicine.iconPackage,
-                          medicine.icon,
-                          24,
-                          "#fff"
+                </View>
+              ) : (
+                <View className="gap-2">
+                  {todayMedData.map((medicine) => (
+                    <View key={medicine.time} className="gap-2">
+                      <View className="flex-row items-center border-[1px] border-zinc-200 bg-white rounded-2xl p-4 shadow-sm">
+                        <View
+                          className={`w-[50px] h-[50px] rounded-full justify-center items-center mr-[15px]`}
+                          style={{ backgroundColor: medicine.color }}
+                        >
+                          {displayIcons(
+                            medicine.iconPackage,
+                            medicine.icon,
+                            24,
+                            "#fff"
+                          )}
+                        </View>
+                        <View className="flex-1 gap-2">
+                          <View>
+                            <Text className="text-[#1a1a1a] text-base font-semibold">
+                              {medicine.name}
+                            </Text>
+                            {/* <Text className="text-[#666] text-sm">{med.doses}</Text> */}
+                          </View>
+
+                          <View className="flex-row items-center">
+                            <Ionicons
+                              name="time-outline"
+                              size={16}
+                              color="#ccc"
+                            />
+                            <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
+                              {medicine.time}
+                            </Text>
+                          </View>
+                        </View>
+                        {medicine.taken ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                              // console.log("Take button pressed.", medicine.taken);
+                              handleMedToggle(
+                                medicine.id,
+                                medicine.time,
+                                medicine.taken
+                                // medicine.date
+                              );
+                            }}
+                            style={{
+                              // borderColor: "#3da35d",
+                              paddingVertical: 8,
+                              paddingHorizontal: 8,
+                              width: 90,
+                            }}
+                            className="flex-row gap-[0.3rem] items-center justify-center border-[1.3px] border-zinc-200 rounded-full"
+                          >
+                            <Ionicons
+                              name="checkmark-circle-outline"
+                              size={18}
+                              color="#3da35d"
+                            />
+                            <Text className="text-[#3da35d] mr-1">Taken</Text>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() => {
+                              // console.log(
+                              //   "TAKEN button pressed.",
+                              //   medicine.taken
+                              // );
+
+                              handleMedToggle(
+                                medicine.id,
+                                medicine.time,
+                                medicine.taken
+                                // medicine.date
+                              );
+                            }}
+                            className="brand-surface  border-[1.3px] surface-bdr rounded-full flex justify-center items-center"
+                            style={{
+                              paddingVertical: 8,
+                              paddingHorizontal: 8,
+                              width: 90,
+                            }}
+                          >
+                            <Text className="brand-text font-semibold">
+                              Take
+                            </Text>
+                          </TouchableOpacity>
                         )}
-                      </View>
-                      <View className="flex-1 gap-2">
-                        <View>
-                          <Text className="text-[#1a1a1a] text-base font-semibold">
-                            {medicine.name}
-                          </Text>
-                          {/* <Text className="text-[#666] text-sm">{med.doses}</Text> */}
-                        </View>
-
-                        <View className="flex-row items-center">
-                          <Ionicons
-                            name="time-outline"
-                            size={16}
-                            color="#ccc"
-                          />
-                          <Text className="text-[#666] text-sm ml-1 mb-[0.2rem]">
-                            {medicine.time}
-                          </Text>
-                        </View>
-                      </View>
-                      {medicine.taken ? (
-                        <TouchableOpacity
-                          onPress={() => {
-                            // console.log("Take button pressed.", medicine.taken);
-                            handleMedToggle(
-                              medicine.id,
-                              medicine.time,
-                              medicine.taken
-                              // medicine.date
-                            );
-                          }}
-                          style={{
-                            // borderColor: "#3da35d",
-                            paddingVertical: 8,
-                            paddingHorizontal: 8,
-                            width: 90,
-                          }}
-                          className="flex-row gap-[0.3rem] items-center justify-center border-[1.3px] border-zinc-200 rounded-full"
-                        >
-                          <Ionicons
-                            name="checkmark-circle-outline"
-                            size={18}
-                            color="#3da35d"
-                          />
-                          <Text className="text-[#3da35d] mr-1">Taken</Text>
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity
-                          onPress={() => {
-                            // console.log(
-                            //   "TAKEN button pressed.",
-                            //   medicine.taken
-                            // );
-
-                            handleMedToggle(
-                              medicine.id,
-                              medicine.time,
-                              medicine.taken
-                              // medicine.date
-                            );
-                          }}
-                          className="brand-surface  border-[1.3px] surface-bdr rounded-full flex justify-center items-center"
-                          style={{
-                            paddingVertical: 8,
-                            paddingHorizontal: 8,
-                            width: 90,
-                          }}
-                        >
-                          <Text className="brand-text font-semibold">Take</Text>
-                        </TouchableOpacity>
-                      )}
-                      {/* {medicine.taken ? (
+                        {/* {medicine.taken ? (
                         <TouchableOpacity
                           onPress={() => {
                             console.log("Take button pressed.", medicine.taken);
@@ -390,11 +417,12 @@ export default function HomeScreen() {
                           <Text className="brand-text font-semibold">Take</Text>
                         </TouchableOpacity>
                       )} */}
+                      </View>
                     </View>
-                  </View>
-                ))}
-              </View>
-            )}
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         </View>
         <Modal

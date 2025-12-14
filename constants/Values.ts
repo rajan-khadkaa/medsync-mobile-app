@@ -81,8 +81,17 @@ const actions = [
 
 const homeActions = [
   {
-    icon: "add-circle-outline" as const,
-    label: "All Medications",
+    icon: "add-circle" as const,
+    label: "Add Med",
+    // label: "Add\nMedications",
+    route: "/medications/add" as const,
+    color: "#2e7d32",
+    gradient: [boxColor, boxColor2] as [string, string],
+    // gradient: ["#4caf50", "#2e7d32"] as [string, string],
+  },
+  {
+    icon: "medical" as const,
+    label: "All Meds",
     // label: "Add\nMedications",
     route: "/medications/display" as const,
     color: "#2e7d32",
@@ -90,8 +99,19 @@ const homeActions = [
     // gradient: ["#4caf50", "#2e7d32"] as [string, string],
   },
   {
-    icon: "calendar-outline" as const,
-    label: "Medication History",
+    // icon: "calendar" as const,
+    // icon: "calendar-clear" as const,
+    icon: "today" as const,
+    label: "Calendar",
+    // label: "Calendar\nView",
+    route: "/medications/calendar" as const,
+    color: "#1976d2",
+    gradient: [boxColor, boxColor2] as [string, string],
+    // gradient: ["#2196f3", "#1976d2"] as [string, string],
+  },
+  {
+    icon: "time" as const,
+    label: "Med Logs",
     // label: "Calendar\nView",
     route: "/medications/history" as const,
     color: "#1976d2",

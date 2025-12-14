@@ -5,7 +5,7 @@ import { Ionicons, Octicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import HeaderBar from "@/components/other/HeaderBar";
 import { displayIcons } from "@/utils/displayIcons";
-import { typeMedObject } from "@/components/types/typeMedObject";
+import { typeMedObject } from "@/components/types/allTypes";
 
 const MedicationHistoryScreen = () => {
   const [medData, setMedData] = useState<typeMedObject>({});

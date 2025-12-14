@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { medFreq } from "@/constants/Values";
-import { typeMedicine } from "../types/typeMedicine";
+import { typeMedicine } from "../types/allTypes";
 import { Ionicons } from "@expo/vector-icons";
 import PrimaryBtn from "../other/PrimaryBtn";
 // import { typePageCounter } from "../types/typePageCounter";

@@ -9,7 +9,7 @@ import {
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { units } from "@/constants/Values";
-import { typeMedicine } from "../types/typeMedicine";
+import { typeMedicine } from "../types/allTypes";
 import PrimaryBtn from "../other/PrimaryBtn";
 import { usePathname, useRouter } from "expo-router";
 import {
@@ -61,7 +61,7 @@ const MedInfo = ({
           <Text className="form-label">Medication Name</Text>
           <TextInput
             className="form-field"
-            placeholder="Eg. Paracetamol"
+            placeholder="Eg. Ibuprofen"
             placeholderTextColor="#999"
             value={medInfo.name || ""} // string fallback
             onChangeText={(value) =>
