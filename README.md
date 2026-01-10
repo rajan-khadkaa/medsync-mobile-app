@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# Medsync – Medication Reminder App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+🎥 **Demo Video:**
+[Watch Demo Here](https://drive.google.com/file/d/1J_flgZBj9lpFztrg_G69bkrJN3kJbiE2/view)
 
-## Get started
+---
 
-1. Install dependencies
+## About the Project
 
-   ```bash
-   npm install
-   ```
+Medsync is a medication reminder mobile app designed to help users manage their medication routines. Users can set schedules, receive reminder notifications, and track completed doses to stay consistent with their health habits.
 
-2. Start the app
+The app was tested on a real Android device to ensure practical usability.
 
-   ```bash
-    npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## Features
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Create and manage medication schedules
+- Reminder notifications for medication times
+- Mark doses as completed
+- Simple and clean user interface
+- Local data storage for offline use
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## Tech Stack
 
-When you're ready, run:
+- React Native (Expo)
+- NativeWind (styling)
+- AsyncStorage (local storage)
+- Expo Push Notifications
+- EAS Build (APK testing on real device)
+
+---
+
+## Installation
 
 ```bash
-npm run reset-project
+git clone https://github.com/rajan-khadkaa/medsync-mobile-app.git
+cd medsync-mobile-app
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Author
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Rajan Khadka
+GitHub: [https://github.com/rajan-khadkaa](https://github.com/rajan-khadkaa)
+Portfolio: [https://rajankhadka-portfolio.vercel.app](https://rajankhadka-portfolio.vercel.app)
