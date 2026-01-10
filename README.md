@@ -1,6 +1,6 @@
 # Medsync – Medication Reminder App
 
-🎥 **Demo Video:**
+**Demo Video:**
 [Watch Demo Here](https://drive.google.com/file/d/1J_flgZBj9lpFztrg_G69bkrJN3kJbiE2/view)
 
 ---
